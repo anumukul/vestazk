@@ -189,6 +189,12 @@
             border: 1px solid var(--border);
         }
         
+        button.danger {
+            background: rgba(255,71,87,0.2);
+            color: var(--danger);
+            border: 1px solid var(--danger);
+        }
+        
         .notice {
             background: var(--accent-dim);
             border: 1px solid var(--accent);
@@ -230,30 +236,19 @@
             color: var(--muted);
         }
         
-        .privacy-features {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin: 40px 0;
-        }
-        
-        .feature {
-            padding: 24px;
+        .commitment-display {
             background: var(--card);
-            border-radius: 12px;
-            border: 1px solid var(--border);
+            border: 1px solid var(--accent);
+            border-radius: 10px;
+            padding: 16px;
+            margin-top: 16px;
+            font-family: 'Space Mono', monospace;
+            font-size: 12px;
+            word-break: break-all;
         }
         
-        .feature-icon {
-            font-size: 32px;
-            margin-bottom: 12px;
-        }
-        
-        .feature h3 { margin-bottom: 8px; }
-        
-        .feature p {
-            font-size: 14px;
-            color: var(--muted);
+        .commitment-display code {
+            color: var(--accent);
         }
         
         footer {
@@ -266,21 +261,6 @@
         }
         
         footer a { color: var(--accent); text-decoration: none; }
-        
-        .commitment-storage {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 12px;
-            margin-top: 16px;
-            font-family: 'Space Mono', monospace;
-            font-size: 12px;
-            word-break: break-all;
-        }
-        
-        .commitment-storage code {
-            color: var(--accent);
-        }
     </style>
 </head>
 <body>
@@ -291,42 +271,20 @@
         </header>
         
         <section class="hero">
-            <h1>Privacy-Preserving Lending</h1>
-            <p>Borrow USDC against WBTC without revealing your position. Zero-knowledge proofs protect your financial privacy from liquidation hunters.</p>
+            <h1>Privacy-Preserving Vault</h1>
+            <p>Deposit WBTC with privacy. Your commitment is stored locally - keep it safe!</p>
             
             <div class="stats-grid">
                 <div class="stat-card">
-                    <div class="stat-value" id="totalCollateral">$0</div>
-                    <div class="stat-label">Total Collateral</div>
+                    <div class="stat-value" id="totalDeposited">0</div>
+                    <div class="stat-label">WBTC Deposited</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-value" id="totalDebt">$0</div>
-                    <div class="stat-label">Total Borrowed</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="healthFactor">0%</div>
-                    <div class="stat-label">Vault Health</div>
+                    <div class="stat-value" id="totalDepositors">0</div>
+                    <div class="stat-label">Total Depositors</div>
                 </div>
             </div>
         </section>
-        
-        <div class="privacy-features">
-            <div class="feature">
-                <div class="feature-icon">🔒</div>
-                <h3>Private Positions</h3>
-                <p>Your collateral and debt amounts are hidden. Only aggregate vault health is public.</p>
-            </div>
-            <div class="feature">
-                <div class="feature-icon">🛡️</div>
-                <h3>Liquidation Protection</h3>
-                <p>MEV bots can't see your health factor. They can't target your position for liquidation.</p>
-            </div>
-            <div class="feature">
-                <div class="feature-icon">⚡</div>
-                <h3>ZK Proofs</h3>
-                <p>Prove your health factor without revealing actual numbers. Powered by Noir + Garaga.</p>
-            </div>
-        </div>
         
         <div class="wallet-section">
             <div class="wallet-row">
@@ -334,55 +292,51 @@
                     <div style="font-size:14px;color:var(--muted);">Connected Wallet</div>
                     <div class="wallet-address" id="walletAddress">Not connected</div>
                 </div>
-                <button class="secondary" id="connectBtn" style="width:auto;padding:8px 16px;">Connect</button>
+                <button class="secondary" id="connectBtn" style="width:auto;padding:8px 16px;">Connect Wallet</button>
             </div>
         </div>
         
         <div class="grid">
             <div class="card">
-                <h2>Deposit WBTC</h2 class="subtitle">Deposit Wrapped>
-                <p Bitcoin to earn yield</p>
+                <h2>Deposit WBTC</h2>
+                <p class="subtitle">Deposit Wrapped Bitcoin to the vault</p>
                 
                 <div class="form-group">
                     <label>Amount (WBTC)</label>
-                    <input type="text" id="depositAmount" placeholder="0.01">
+                    <input type="number" step="0.00000001" id="depositAmount" placeholder="0.01">
                 </div>
                 
-                <button id="depositBtn">Deposit</button>
+                <button id="depositBtn">Deposit WBTC</button>
                 
                 <div id="depositStatus"></div>
                 
                 <div class="notice">
-                    💡 Your commitment is saved locally. Don't lose it or you lose access to your funds!
+                    💡 Your commitment is generated on-chain and shown after deposit. SAVE IT - you need it to withdraw!
                 </div>
                 
-                <div class="commitment-storage" id="commitmentDisplay" style="display:none;">
+                <div class="commitment-display" id="myCommitment" style="display:none;">
                     <strong>Your Commitment:</strong><br>
                     <code id="commitmentCode">-</code>
                 </div>
             </div>
             
             <div class="card">
-                <h2>Borrow USDC</h2>
-                <p class="subtitle">Borrow against your WBTC without revealing position</p>
+                <h2>Withdraw WBTC</h2>
+                <p class="subtitle">Withdraw your deposited WBTC</p>
                 
                 <div class="form-group">
-                    <label>Borrow Amount (USDC)</label>
-                    <input type="text" id="borrowAmount" placeholder="1000">
+                    <label>Your Commitment</label>
+                    <input type="text" id="withdrawCommitment" placeholder="0x...">
                 </div>
                 
                 <div class="form-group">
-                    <label>Recipient Address</label>
-                    <input type="text" id="recipientAddress" placeholder="0x...">
+                    <label>Amount (WBTC)</label>
+                    <input type="number" step="0.00000001" id="withdrawAmount" placeholder="0.01">
                 </div>
                 
-                <button id="borrowBtn" disabled>Generate Proof & Borrow</button>
+                <button id="withdrawBtn" class="secondary">Withdraw WBTC</button>
                 
-                <div id="borrowStatus"></div>
-                
-                <div class="notice">
-                    🔐 Proof generation takes 30-60 seconds. Your actual position remains hidden.
-                </div>
+                <div id="withdrawStatus"></div>
             </div>
             
             <div class="card">
@@ -395,48 +349,38 @@
                 </div>
                 
                 <div class="form-group">
-                    <label>Total Depositors</label>
-                    <input type="text" id="totalDepositors" readonly>
+                    <label>Your Commitment (lookup)</label>
+                    <input type="text" id="lookupAddress" placeholder="Wallet address">
                 </div>
                 
-                <button class="secondary" id="refreshStats">Refresh Stats</button>
-            </div>
-            
-            <div class="card">
-                <h2>Emergency Exit</h2>
-                <p class="subtitle">Withdraw with 2% fee</p>
+                <button class="secondary" id="lookupBtn">Lookup</button>
+                <div id="lookupResult"></div>
                 
-                <div class="form-group">
-                    <label>Your Commitment</label>
-                    <input type="text" id="exitCommitment" placeholder="0x...">
-                </div>
-                
-                <div class="form-group">
-                    <label>Amount</label>
-                    <input type="text" id="exitAmount" placeholder="0.01">
-                </div>
-                
-                <button id="emergencyExitBtn" class="danger" disabled>Emergency Withdraw</button>
-                
-                <div id="exitStatus"></div>
+                <button class="secondary" id="refreshBtn" style="margin-top:16px;">Refresh Stats</button>
             </div>
         </div>
         
         <footer>
-            <p>Built on <a href="https://starknet.io">Starknet</a> with <a href="https://noir-lang.org">Noir</a> + <a href="https://garaga.io">Garaga</a></p>
+            <p>Built on <a href="https://starknet.io">Starknet</a></p>
             <p>VestaZK © 2026 - Hackathon Project</p>
         </footer>
     </div>
     
     <script type="module">
-        import { VestazkService, createVestazkService } from './vestazk-service.js';
-        import { PragmaService, createPragmaService } from './pragma-service.js';
+        const VAULT_ADDRESS = '0x05d2ef72d21c86a78d2b6a311874eb3031dd8137f51e83c8b7d36c817a6aae0b';
+        const WBTC_ADDRESS = '0x00452bd5c0512a61df7c7be8cfea5e4f893cb40e126bdc40aee6054db955129e';
         
-        const VAULT_ADDRESS = '0x04997bb4f992a6c9918030b34947fcc2bc73ce0068e9077a6b07c0abce40baaf';
+        const ABI = [
+            { name: "deposit", type: "function", inputs: [{name:"amount",type:"u256"}], outputs: [{name:"commitment",type:"felt252"}] },
+            { name: "withdraw", type: "function", inputs: [{name:"commitment",type:"felt252"},{name:"amount",type:"u256"}], outputs: [{name:"success",type:"bool"}] },
+            { name: "get_merkle_root", type: "function", inputs: [], outputs: [{name:"root",type:"felt252"}] },
+            { name: "get_commitment_count", type: "function", inputs: [], outputs: [{name:"count",type:"u64"}] },
+            { name: "get_total_deposited", type: "function", inputs: [], outputs: [{name:"total",type:"u256"}] },
+            { name: "get_commitment", type: "function", inputs: [{name:"user",type:"contract_address"}], outputs: [{name:"commitment",type:"felt252"}] }
+        ];
         
-        let vestazk = createVestazkService('sepolia');
-        let pragma = createPragmaService('sepolia');
-        let walletAddress = null;
+        let wallet = null;
+        let vaultContract = null;
         
         const STORAGE_KEY = 'vestazk_commitments';
         
@@ -445,62 +389,65 @@
             return data ? JSON.parse(data) : {};
         }
         
-        function saveCommitment(address, commitment, amount) {
+        function saveCommitment(address, commitment) {
             const commitments = getStoredCommitments();
-            commitments[address] = { commitment, amount, timestamp: Date.now() };
+            commitments[address.toLowerCase()] = { commitment, timestamp: Date.now() };
             localStorage.setItem(STORAGE_KEY, JSON.stringify(commitments));
         }
         
-        function getCommitment(address) {
+        function getMyCommitment() {
+            if (!wallet?.selectedAddress) return null;
             const commitments = getStoredCommitments();
-            return commitments[address];
+            return commitments[wallet.selectedAddress.toLowerCase()]?.commitment || null;
         }
         
         async function connectWallet() {
-            if (typeof window.starknet !== 'undefined') {
-                try {
-                    await window.starknet.enable();
-                    walletAddress = window.starknet.selectedAddress;
-                    document.getElementById('walletAddress').textContent = 
-                        walletAddress.substring(0, 8) + '...' + walletAddress.substring(60);
-                    document.getElementById('connectBtn').textContent = 'Connected';
-                    document.getElementById('connectBtn').disabled = true;
-                    
-                    updateCommitmentDisplay();
-                    await refreshStats();
-                } catch (e) {
-                    console.error('Wallet connection failed:', e);
-                }
-            } else {
-                alert('Please install a Starknet wallet (Argent X or Braavos)');
+            if (typeof window.starknet === 'undefined') {
+                alert('Please install Argent X or Braavos wallet');
+                return;
+            }
+            
+            try {
+                await window.starknet.enable();
+                wallet = window.starknet;
+                
+                document.getElementById('walletAddress').textContent = 
+                    wallet.selectedAddress.substring(0, 8) + '...' + wallet.selectedAddress.substring(60);
+                document.getElementById('connectBtn').textContent = 'Connected';
+                document.getElementById('connectBtn').disabled = true;
+                
+                vaultContract = new window.starknet.Contract(ABI, VAULT_ADDRESS);
+                
+                updateMyCommitmentDisplay();
+                await refreshStats();
+            } catch (e) {
+                console.error(e);
+                alert('Failed to connect wallet');
             }
         }
         
-        function updateCommitmentDisplay() {
-            if (!walletAddress) return;
-            const userCommitment = getCommitment(walletAddress);
-            if (userCommitment) {
-                document.getElementById('commitmentDisplay').style.display = 'block';
-                document.getElementById('commitmentCode').textContent = userCommitment.commitment;
+        function updateMyCommitmentDisplay() {
+            const commitment = getMyCommitment();
+            if (commitment) {
+                document.getElementById('myCommitment').style.display = 'block';
+                document.getElementById('commitmentCode').textContent = commitment;
+                document.getElementById('withdrawCommitment').value = commitment;
             }
         }
         
         async function refreshStats() {
+            if (!vaultContract) return;
+            
             try {
-                const stats = await vestazk.getVaultStats();
-                document.getElementById('merkleRoot').value = stats.merkleRoot || '0x0';
-                document.getElementById('totalDepositors').value = stats.commitmentCount || '0';
+                const [merkleRoot, count, total] = await Promise.all([
+                    vaultContract.get_merkle_root(),
+                    vaultContract.get_commitment_count(),
+                    vaultContract.get_total_deposited()
+                ]);
                 
-                const btcPrice = await pragma.getBTCPrice();
-                const collateralUSD = Number(stats.totalDeposited) * Number(btcPrice.price) / 1e8;
-                const debtUSD = Number(stats.totalBorrowed) / 1e6;
-                
-                document.getElementById('totalCollateral').textContent = 
-                    '$' + collateralUSD.toLocaleString(undefined, {maximumFractionDigits: 0});
-                document.getElementById('totalDebt').textContent = 
-                    '$' + debtUSD.toLocaleString(undefined, {maximumFractionDigits: 0});
-                document.getElementById('healthFactor').textContent = 
-                    (Number(stats.healthFactor.health) / 100).toFixed(2) + '%';
+                document.getElementById('merkleRoot').value = merkleRoot;
+                document.getElementById('totalDepositors').textContent = count.toString();
+                document.getElementById('totalDeposited').textContent = (Number(total) / 1e8).toFixed(8);
             } catch (e) {
                 console.error('Failed to refresh stats:', e);
             }
@@ -508,54 +455,105 @@
         
         async function handleDeposit() {
             const amount = document.getElementById('depositAmount').value;
-            if (!amount || !walletAddress) return;
+            if (!amount || !wallet) return;
             
             const statusEl = document.getElementById('depositStatus');
             statusEl.innerHTML = '<div class="status loading">Processing deposit...</div>';
             
             try {
-                const amountWei = BigInt(Math.parseFloat(amount) * 1e8);
-                const result = await vestazk.deposit(amountWei);
+                const amountWei = BigInt(Math.floor(parseFloat(amount) * 1e8));
                 
-                saveCommitment(walletAddress, result.commitment, amount);
-                updateCommitmentDisplay();
+                const wbtcContract = new wallet.Contract([
+                    { name: "approve", type: "function", inputs: [{name:"spender",type:"contract_address"},{name:"amount",type:"u256"}], outputs: [] },
+                    { name: "allowance", type: "function", inputs: [{name:"owner",type:"contract_address"},{name:"spender",type:"contract_address"}], outputs: [{name:"remaining",type:"u256"}] }
+                ], WBTC_ADDRESS);
                 
-                statusEl.innerHTML = '<div class="status success">✅ Deposit successful! Commitment: ' + 
-                    result.commitment.substring(0, 16) + '...</div>';
+                const currentAllowance = await wbtcContract.allowance(wallet.selectedAddress, VAULT_ADDRESS);
+                
+                if (BigInt(currentAllowance) < amountWei) {
+                    statusEl.innerHTML = '<div class="status loading">Approving WBTC...</div>';
+                    await wbtcContract.approve(VAULT_ADDRESS, amountWei);
+                    await new Promise(r => setTimeout(r, 3000));
+                }
+                
+                statusEl.innerHTML = '<div class="status loading">Depositing...</div>';
+                
+                const tx = await vaultContract.deposit(amountWei);
+                await wallet.provider.waitForTransaction(tx.transaction_hash);
+                
+                const receipt = await wallet.provider.getTransactionReceipt(tx.transaction_hash);
+                const event = receipt.events.find(e => e.keys[0] === '0x3e0d5f2d5a3d1d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3');
+                const commitment = event?.data[2] || '0x0';
+                
+                saveCommitment(wallet.selectedAddress, commitment);
+                updateMyCommitmentDisplay();
+                
+                statusEl.innerHTML = '<div class="status success">✅ Deposit successful!<br>Commitment: ' + commitment.substring(0, 20) + '...</div>';
                 
                 await refreshStats();
             } catch (e) {
-                statusEl.innerHTML = '<div class="status error">❌ Deposit failed: ' + e.message + '</div>';
+                console.error(e);
+                statusEl.innerHTML = '<div class="status error">❌ Deposit failed: ' + (e.message || e.toString()) + '</div>';
             }
         }
         
-        async function handleBorrow() {
-            const amount = document.getElementById('borrowAmount').value;
-            const recipient = document.getElementById('recipientAddress').value;
+        async function handleWithdraw() {
+            const commitment = document.getElementById('withdrawCommitment').value;
+            const amount = document.getElementById('withdrawAmount').value;
             
-            if (!amount || !recipient || !walletAddress) return;
+            if (!commitment || !amount || !wallet) return;
             
-            const statusEl = document.getElementById('borrowStatus');
-            statusEl.innerHTML = '<div class="status loading">⏳ Generating ZK proof (30-60 seconds)...</div>';
+            const statusEl = document.getElementById('withdrawStatus');
+            statusEl.innerHTML = '<div class="status loading">Processing withdrawal...</div>';
             
             try {
-                await new Promise(resolve => setTimeout(resolve, 1000));
+                const amountWei = BigInt(Math.floor(parseFloat(amount) * 1e8));
                 
-                statusEl.innerHTML = '<div class="status loading">📝 Submitting transaction...</div>';
+                const tx = await vaultContract.withdraw(commitment, amountWei);
+                await wallet.provider.waitForTransaction(tx.transaction_hash);
                 
-                statusEl.innerHTML = '<div class="status success">✅ Borrow successful!</div>';
+                const commitments = getStoredCommitments();
+                delete commitments[wallet.selectedAddress.toLowerCase()];
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(commitments));
+                
+                updateMyCommitmentDisplay();
+                statusEl.innerHTML = '<div class="status success">✅ Withdrawal successful!</div>';
+                
                 await refreshStats();
             } catch (e) {
-                statusEl.innerHTML = '<div class="status error">❌ Borrow failed: ' + e.message + '</div>';
+                console.error(e);
+                statusEl.innerHTML = '<div class="status error">❌ Withdrawal failed: ' + (e.message || e.toString()) + '</div>';
+            }
+        }
+        
+        async function handleLookup() {
+            const address = document.getElementById('lookupAddress').value;
+            if (!address || !vaultContract) return;
+            
+            const resultEl = document.getElementById('lookupResult');
+            resultEl.innerHTML = '<div class="status loading">Looking up...</div>';
+            
+            try {
+                const commitment = await vaultContract.get_commitment(address);
+                if (commitment && commitment !== '0x0') {
+                    resultEl.innerHTML = '<div class="status success">Commitment: <code>' + commitment + '</code></div>';
+                } else {
+                    resultEl.innerHTML = '<div class="status">No commitment found for this address</div>';
+                }
+            } catch (e) {
+                resultEl.innerHTML = '<div class="status error">Lookup failed</div>';
             }
         }
         
         document.getElementById('connectBtn').addEventListener('click', connectWallet);
         document.getElementById('depositBtn').addEventListener('click', handleDeposit);
-        document.getElementById('borrowBtn').addEventListener('click', handleBorrow);
-        document.getElementById('refreshStats').addEventListener('click', refreshStats);
+        document.getElementById('withdrawBtn').addEventListener('click', handleWithdraw);
+        document.getElementById('lookupBtn').addEventListener('click', handleLookup);
+        document.getElementById('refreshBtn').addEventListener('click', refreshStats);
         
-        refreshStats();
+        if (typeof window.starknet !== 'undefined') {
+            window.starknet.on('accountsChanged', () => location.reload());
+        }
     </script>
 </body>
 </html>
