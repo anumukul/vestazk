@@ -1,0 +1,8 @@
+[package]
+name = "donation_badge"
+type = "bin"
+authors = ["Tongo Donation Demo"]
+
+[dependencies]
+poseidon = { git = "https://github.com/noir-lang/poseidon", tag = "v0.1.1" }
+

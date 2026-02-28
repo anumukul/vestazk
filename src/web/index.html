@@ -1,0 +1,3767 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tongo Private Tutorial - Quickstart</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Martian+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.cdnfonts.com/css/cooper-hewitt" rel="stylesheet" />
+    <link href="https://fonts.cdnfonts.com/css/junicode" rel="stylesheet" />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%2300ff00' opacity='0.2'/><text y='.9em' font-size='60' fill='%2300ff00' font-family='monospace'>[ENC]</text></svg>">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #0c0a18;
+            --surface: #110f1d;
+            --card: #141126;
+            --card-border: rgba(243, 242, 241, 0.08);
+            --text: #f3f2f1;
+            --muted: rgba(243, 242, 241, 0.7);
+            --accent: #5b7ecf;
+            --accent-2: #8b5cf6;
+            --accent-3: #3b82f6;
+            --accent-soft: rgba(91, 126, 207, 0.18);
+            --success: #35c7ff;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+        }
+
+        body {
+            font-family: 'Martian Mono', monospace;
+            background: var(--bg);
+            color: var(--text);
+            padding: 24px;
+            line-height: 1.6;
+        }
+
+        h1, h2, h3, h4, h5, h6,
+        .font-display {
+            font-family: 'Cooper Hewitt Heavy', 'Cooper Hewitt', system-ui, sans-serif;
+            font-weight: 800;
+        }
+
+        .font-subheading {
+            font-family: 'Junicode', Georgia, serif;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: radial-gradient(1200px 600px at 20% -10%, rgba(91, 126, 207, 0.25), transparent 60%),
+                        radial-gradient(900px 500px at 90% 10%, rgba(139, 92, 246, 0.18), transparent 60%),
+                        var(--surface);
+            border: 1px solid var(--card-border);
+            color: var(--text);
+            padding: 40px 32px;
+            text-align: left;
+            margin-bottom: 30px;
+            border-radius: 16px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .hero__content {
+            max-width: 800px;
+            margin: 0;
+        }
+
+        .hero__eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            border-radius: 999px;
+            border: 1px solid var(--card-border);
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--muted);
+            font-size: 0.7rem;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+        }
+
+        .hero__title {
+            font-size: clamp(2.8rem, 6vw, 4.5rem);
+            font-weight: 800;
+            margin-bottom: 14px;
+            letter-spacing: -0.02em;
+            line-height: 1.05;
+            background: linear-gradient(90deg, #f3f2f1 0%, #b8c7f1 45%, #a78bfa 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .hero__subtitle {
+            font-size: 1.15em;
+            color: var(--muted);
+            margin-bottom: 24px;
+            line-height: 1.5;
+            font-family: 'Junicode', Georgia, serif;
+            max-width: 720px;
+        }
+
+        .hero__stats {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+
+        .hero__actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .hero__actions a {
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            border-radius: 999px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            color: #fff;
+            border: 1px solid rgba(91, 126, 207, 0.6);
+            font-weight: 600;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #6b8edf, #7c3aed);
+            border-color: rgba(123, 58, 237, 0.6);
+            box-shadow: 0 10px 26px rgba(91, 126, 207, 0.35);
+        }
+
+        .btn-ghost {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            border-radius: 999px;
+            border: 1px solid var(--card-border);
+            color: var(--text);
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .btn-ghost:hover {
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .hero__meta {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            color: var(--muted);
+            font-size: 0.85em;
+        }
+
+        .hero__meta span {
+            padding: 6px 10px;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .hero__links {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+            margin-top: 14px;
+            font-size: 0.85em;
+            color: var(--muted);
+        }
+
+        .hero__links a {
+            color: var(--text);
+            text-decoration: none;
+            border-bottom: 1px solid transparent;
+            padding-bottom: 2px;
+        }
+
+        .hero__links a:hover {
+            border-color: rgba(91, 126, 207, 0.6);
+        }
+
+        .stat {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 12px;
+            padding: 12px 16px;
+            min-width: 160px;
+        }
+
+        .stat__value {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .stat__label {
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: var(--surface);
+            border: 1px solid var(--card-border);
+            padding: 24px;
+            border-radius: 16px;
+            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.25);
+        }
+
+        /* Cards */
+        .card {
+            background: var(--card);
+            border: 1px solid var(--card-border);
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 14px;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .card:hover {
+            border-color: rgba(79, 70, 229, 0.45);
+            box-shadow: 0 12px 30px rgba(15, 23, 42, 0.45);
+        }
+
+        .card__header {
+            border-bottom: 1px solid var(--card-border);
+            padding-bottom: 12px;
+            margin-bottom: 16px;
+        }
+
+        .card__header h2 {
+            font-size: 1.2em;
+            color: var(--text);
+            margin: 0;
+            font-weight: 600;
+        }
+
+        .card__subtitle {
+            font-size: 0.85em;
+            color: var(--muted);
+            margin: 8px 0 0 0;
+            font-family: 'Junicode', Georgia, serif;
+        }
+
+        /* Grid Layout */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            margin-bottom: 30px;
+        }
+
+        /* Balance Items */
+        .balance-item {
+            background: #0b1220;
+            border: 1px solid var(--card-border);
+            padding: 15px;
+            margin-bottom: 12px;
+            border-radius: 10px;
+        }
+
+        .balance-item__label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9em;
+            color: var(--text);
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .balance-item__value {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: var(--text);
+            margin-bottom: 4px;
+        }
+
+        .balance-item__hint {
+            font-size: 0.8em;
+            color: var(--muted);
+            margin: 0;
+        }
+
+        /* Info Rows */
+        .info-row {
+            margin-bottom: 10px;
+            font-size: 0.9em;
+        }
+
+        .label {
+            color: var(--muted);
+            font-weight: 600;
+            display: block;
+            margin-bottom: 4px;
+            font-family: 'Junicode', Georgia, serif;
+        }
+
+        .value {
+            color: var(--text);
+            word-break: break-all;
+            font-size: 0.85em;
+            font-family: ui-monospace, SFMono-Regular, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+        }
+
+        .value-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .value-row .value {
+            flex: 1;
+        }
+
+        .inline-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        button.small {
+            padding: 6px 10px;
+            font-size: 0.7em;
+            margin-bottom: 0;
+        }
+
+        .input-status {
+            font-size: 0.75em;
+            margin: -4px 0 12px 0;
+            color: var(--muted);
+        }
+
+        .input-status.valid {
+            color: var(--success);
+        }
+
+        .input-status.invalid {
+            color: var(--danger);
+        }
+
+        .input-status.warn {
+            color: var(--warning);
+        }
+
+        .danger-hint {
+            font-size: 0.8em;
+            color: var(--danger);
+            margin-top: 8px;
+        }
+
+        .text-muted {
+            color: var(--muted);
+        }
+
+        .text-accent {
+            color: var(--accent);
+        }
+
+        .text-success {
+            color: var(--success);
+        }
+
+        .text-warning {
+            color: var(--warning);
+        }
+
+        .text-danger {
+            color: var(--danger);
+        }
+
+        .max-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            background: var(--accent-soft);
+            border: 1px solid rgba(91, 126, 207, 0.35);
+            border-radius: 10px;
+        }
+
+        .max-row span {
+            font-size: 0.85em;
+        }
+
+        .max-row .max-value {
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .notice {
+            background: rgba(34, 197, 94, 0.08);
+            border: 1px solid rgba(34, 197, 94, 0.35);
+            color: var(--text);
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 0.85em;
+        }
+
+        .notice code {
+            color: var(--text);
+        }
+
+        .tutorial-steps {
+            list-style: none;
+            display: grid;
+            gap: 12px;
+            margin: 10px 0 0 0;
+            padding: 0;
+        }
+
+        .tutorial-step {
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            background: #0b1220;
+            border: 1px solid var(--card-border);
+            border-radius: 10px;
+            padding: 12px;
+        }
+
+        .tutorial-step .step-index {
+            font-weight: bold;
+            color: var(--accent);
+            min-width: 70px;
+        }
+
+        .tutorial-step .step-text {
+            color: var(--muted);
+            font-size: 0.85em;
+            line-height: 1.4;
+        }
+
+        .faq details {
+            background: #0b1220;
+            border: 1px solid var(--card-border);
+            border-radius: 10px;
+            padding: 12px 14px;
+            margin-bottom: 10px;
+        }
+
+        .faq summary {
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--text);
+            list-style: none;
+        }
+
+        .faq summary::-webkit-details-marker {
+            display: none;
+        }
+
+        .faq summary::after {
+            content: '+';
+            float: right;
+            color: var(--muted);
+        }
+
+        .faq details[open] summary::after {
+            content: '−';
+        }
+
+        .faq p {
+            color: var(--muted);
+            font-size: 0.9em;
+            margin-top: 10px;
+            line-height: 1.5;
+        }
+
+        /* Inputs */
+        input, select {
+            width: 100%;
+            padding: 10px 12px;
+            font-size: 0.9em;
+            border: 1px solid var(--card-border);
+            border-radius: 10px;
+            background: #0b1220;
+            color: var(--text);
+            font-family: inherit;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+            margin-bottom: 10px;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: rgba(79, 70, 229, 0.7);
+            box-shadow: 0 0 0 3px var(--accent-soft);
+        }
+
+        /* Quick Amount Buttons */
+        .quick-amounts {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .quick-btn {
+            padding: 16px;
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            background: #0b1220;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: left;
+            font-family: inherit;
+        }
+
+        .quick-btn:hover {
+            border-color: rgba(79, 70, 229, 0.6);
+            background: rgba(79, 70, 229, 0.1);
+        }
+
+        .quick-btn.active {
+            border-color: var(--accent);
+            background: var(--accent);
+            color: #fff;
+        }
+
+        .quick-btn .amount {
+            display: block;
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .quick-btn .impact {
+            display: block;
+            font-size: 12px;
+            opacity: 0.7;
+        }
+
+        /* Buttons */
+        button {
+            width: 100%;
+            padding: 10px 14px;
+            font-size: 0.9em;
+            font-weight: 600;
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            color: #fff;
+            border: 1px solid rgba(91, 126, 207, 0.6);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+            margin-bottom: 10px;
+            font-family: inherit;
+        }
+
+        button:hover:not(:disabled) {
+            background: linear-gradient(135deg, #6b8edf, #7c3aed);
+            border-color: rgba(123, 58, 237, 0.6);
+            box-shadow: 0 10px 26px rgba(91, 126, 207, 0.35);
+        }
+
+        button:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        button.secondary {
+            background: transparent;
+            color: var(--text);
+            border: 1px solid var(--card-border);
+        }
+
+        button.secondary:hover:not(:disabled) {
+            background: rgba(148, 163, 184, 0.1);
+        }
+
+        button.danger {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--danger);
+            border-color: rgba(239, 68, 68, 0.4);
+        }
+
+        /* Privacy Notice */
+        .privacy-notice {
+            font-size: 0.8em;
+            color: var(--muted);
+            background: rgba(79, 70, 229, 0.08);
+            border: 1px solid rgba(79, 70, 229, 0.25);
+            padding: 12px;
+            border-radius: 10px;
+            margin: 20px 0 0 0;
+            line-height: 1.6;
+        }
+
+        /* Operation Status Banners */
+        .operation-status {
+            margin-top: 12px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 0.9em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .operation-status.loading {
+            background: rgba(79, 70, 229, 0.15);
+            border: 1px solid rgba(79, 70, 229, 0.4);
+            color: #a5b4fc;
+        }
+        
+        .operation-status.success {
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid rgba(16, 185, 129, 0.4);
+            color: #6ee7b7;
+        }
+        
+        .operation-status.error {
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid rgba(239, 68, 68, 0.4);
+            color: #fca5a5;
+        }
+        
+        .operation-status .status-icon {
+            font-size: 1.2em;
+        }
+        
+        .operation-status .status-message {
+            flex: 1;
+        }
+        
+        .operation-status .status-link {
+            color: inherit;
+            text-decoration: underline;
+            opacity: 0.8;
+        }
+        
+        .operation-status .status-link:hover {
+            opacity: 1;
+        }
+        
+        .operation-status.loading .status-icon {
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* Logs */
+        .log-panel {
+            grid-column: 1 / -1;
+            background: #0b1220;
+            border: 1px solid var(--card-border);
+            padding: 15px;
+            border-radius: 12px;
+            max-height: 400px;
+            overflow-y: auto;
+            font-size: 0.85em;
+        }
+
+        .log-entry {
+            margin-bottom: 8px;
+            padding: 5px 0;
+            border-left: 2px solid var(--accent);
+            padding-left: 10px;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+        }
+
+        .log-success {
+            color: var(--success);
+            border-left-color: var(--success);
+        }
+
+        .log-error {
+            color: var(--danger);
+            border-left-color: var(--danger);
+        }
+
+        .log-info {
+            color: var(--muted);
+            border-left-color: var(--muted);
+        }
+
+        .log-warn {
+            color: var(--warning);
+            border-left-color: var(--warning);
+        }
+
+        /* Badge Section - Modern Design */
+        /* Badge Section - Horizontal Layout */
+        .badge-section-grid {
+            display: flex;
+            gap: 16px;
+            margin-top: 20px;
+            align-items: stretch;
+        }
+        
+        @media (max-width: 600px) {
+            .badge-section-grid {
+                flex-direction: column;
+            }
+        }
+        
+        .badge-current-card {
+            background: linear-gradient(135deg, rgba(79, 70, 229, 0.15) 0%, rgba(79, 70, 229, 0.05) 100%);
+            border: 1px solid rgba(79, 70, 229, 0.3);
+            border-radius: 12px;
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            min-width: 180px;
+        }
+        
+        .badge-current-card .badge-icon-large {
+            font-size: 2.5em;
+            filter: drop-shadow(0 2px 8px rgba(79, 70, 229, 0.3));
+        }
+        
+        .badge-current-card .badge-tier-name {
+            font-size: 1.1em;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 2px;
+        }
+        
+        .badge-current-card .badge-description {
+            font-size: 0.75em;
+            color: var(--muted);
+            line-height: 1.3;
+        }
+        
+        .badge-tiers-preview {
+            display: flex;
+            gap: 10px;
+            flex: 1;
+        }
+        
+        @media (max-width: 600px) {
+            .badge-tiers-preview {
+                flex-direction: column;
+            }
+        }
+        
+        .badge-tier-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 14px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            transition: all 0.2s ease;
+            flex: 1;
+        }
+        
+        .badge-tier-item:hover {
+            background: rgba(79, 70, 229, 0.1);
+            border-color: rgba(79, 70, 229, 0.3);
+        }
+        
+        .badge-tier-item.active {
+            background: rgba(79, 70, 229, 0.15);
+            border-color: var(--accent);
+        }
+        
+        .badge-tier-item .tier-icon {
+            font-size: 1.3em;
+        }
+        
+        .badge-tier-item .tier-info {
+            flex: 1;
+        }
+        
+        .badge-tier-item .tier-name {
+            font-weight: 600;
+            color: var(--text);
+            font-size: 0.9em;
+        }
+        
+        .badge-tier-item .tier-threshold {
+            font-size: 0.75em;
+            color: var(--muted);
+        }
+        
+        .badge-tier-item .tier-check {
+            color: var(--accent);
+            font-size: 1em;
+        }
+
+        .badge-claim-form {
+            margin-top: 24px;
+            padding: 24px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        
+        .badge-claim-form h3 {
+            margin: 0 0 8px 0;
+            font-size: 1.1em;
+            color: var(--text);
+        }
+
+        .badge-claim-form .form-group {
+            margin-bottom: 16px;
+        }
+
+        .badge-claim-form label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--muted);
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+
+        .badge-claim-form input,
+        .badge-claim-form select {
+            width: 100%;
+            padding: 12px 14px;
+            background: rgba(11, 18, 32, 0.8);
+            border: 1px solid var(--card-border);
+            border-radius: 10px;
+            color: var(--text);
+            font-family: inherit;
+            font-size: 0.95em;
+            transition: all 0.2s ease;
+        }
+
+        .badge-claim-form input:focus,
+        .badge-claim-form select:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-soft);
+            background: rgba(11, 18, 32, 1);
+        }
+
+        .badge-claim-form small {
+            display: block;
+            margin-top: 6px;
+            color: #666;
+            font-size: 0.8em;
+            line-height: 1.4;
+        }
+        
+        .badge-claim-form button {
+            width: 100%;
+            margin-top: 8px;
+        }
+        
+        .badge-status-inline {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 16px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 0.9em;
+        }
+        
+        .badge-status-inline.checking {
+            background: rgba(234, 179, 8, 0.1);
+            border: 1px solid rgba(234, 179, 8, 0.3);
+            color: #fbbf24;
+        }
+        
+        .badge-status-inline.online {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: #6ee7b7;
+        }
+        
+        .badge-status-inline.offline {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #fca5a5;
+        }
+        
+        .badge-status-inline .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        
+        .badge-status-inline.checking .status-dot {
+            background: #fbbf24;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+        
+        .badge-status-inline.online .status-dot {
+            background: #10b981;
+        }
+        
+        .badge-status-inline.offline .status-dot {
+            background: #ef4444;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+        
+        .badge-proof-result {
+            padding: 16px;
+            border-radius: 12px;
+            margin-top: 16px;
+            text-align: center;
+        }
+        
+        .badge-proof-result.success {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+        
+        .badge-proof-result.loading {
+            background: rgba(79, 70, 229, 0.1);
+            border: 1px solid rgba(79, 70, 229, 0.3);
+        }
+        
+        .badge-proof-result.error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .status-message {
+            padding: 12px;
+            border-radius: 10px;
+            margin-top: 12px;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+
+        /* Status */
+        .status {
+            text-align: center;
+            margin: 15px 0;
+            padding: 10px;
+            border: 1px solid var(--card-border);
+            border-radius: 10px;
+            font-weight: 600;
+            color: var(--text);
+            background: rgba(15, 23, 42, 0.6);
+        }
+
+        .status.loading {
+            color: var(--warning);
+            border-color: rgba(245, 158, 11, 0.4);
+        }
+
+        .status.success {
+            color: var(--success);
+            background: rgba(34, 197, 94, 0.1);
+            border-color: rgba(34, 197, 94, 0.35);
+        }
+
+        .status.error {
+            color: var(--danger);
+            background: rgba(239, 68, 68, 0.1);
+            border-color: rgba(239, 68, 68, 0.35);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--surface);
+            border: 1px solid var(--card-border);
+            padding: 30px;
+            border-radius: 14px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-content h2 {
+            margin-bottom: 20px;
+            color: var(--text);
+            font-size: 1.2em;
+        }
+
+        .modal-content .key-display {
+            background: #0b1220;
+            padding: 15px;
+            border: 1px solid var(--card-border);
+            border-radius: 10px;
+            word-break: break-all;
+            font-size: 0.9em;
+            margin: 15px 0;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+        }
+
+        /* Privacy Section */
+        .privacy-section {
+            margin: 60px 0;
+            padding: 40px;
+            background: var(--surface);
+            border-radius: 16px;
+        }
+
+        .privacy-section h2 {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        .privacy-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 24px;
+        }
+
+        .privacy-card {
+            text-align: center;
+            padding: 24px;
+            background: #0b1220;
+            border-radius: 12px;
+        }
+
+        .privacy-card .icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .privacy-card h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 12px;
+        }
+
+        .privacy-card p {
+            font-size: 14px;
+            color: var(--muted);
+            line-height: 1.5;
+        }
+
+        /* Balance Explainer */
+        .balance-explainer {
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+
+        .balance-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+
+        .balance-card {
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid var(--card-border);
+            background: var(--card);
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .balance-card:hover {
+            border-color: rgba(79, 70, 229, 0.45);
+            box-shadow: 0 12px 30px rgba(15, 23, 42, 0.45);
+        }
+
+        .balance-card--current {
+            border-color: rgba(79, 70, 229, 0.5);
+        }
+
+        .balance-card--pending {
+            border-color: rgba(245, 158, 11, 0.5);
+        }
+
+        .balance-header {
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .balance-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.1em;
+            font-weight: 600;
+            color: var(--text);
+            margin: 0 0 8px 0;
+        }
+
+        .balance-title .icon {
+            font-size: 20px;
+        }
+
+        .balance-subtitle {
+            font-size: 0.85em;
+            color: var(--muted);
+            margin: 0;
+            font-weight: 600;
+        }
+
+        .balance-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: var(--text);
+            margin-bottom: 16px;
+        }
+
+        .balance-card--pending .balance-value {
+            color: var(--warning);
+        }
+
+        .balance-description {
+            margin-bottom: 16px;
+        }
+
+        .description-text {
+            font-size: 0.9em;
+            color: var(--muted);
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        .description-text strong {
+            font-weight: bold;
+            color: var(--text);
+        }
+
+        .balance-card--pending .description-text strong {
+            color: var(--warning);
+        }
+
+        .balance-action {
+            margin-bottom: 16px;
+        }
+
+        .balance-details {
+            background: #0b1220;
+            border: 1px solid var(--card-border);
+            border-radius: 10px;
+            padding: 12px;
+        }
+
+        .balance-details summary {
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85em;
+            color: var(--text);
+        }
+
+        .balance-details ul {
+            margin: 12px 0 0 0;
+            padding-left: 20px;
+            font-size: 0.85em;
+            color: var(--muted);
+            line-height: 1.6;
+        }
+
+        .balance-details li {
+            margin-bottom: 6px;
+        }
+
+        /* Flow Diagram */
+        .balance-flow {
+            background: #0b1220;
+            border-radius: 12px;
+            padding: 24px;
+            border: 1px solid var(--card-border);
+            margin-bottom: 30px;
+        }
+
+        .balance-flow h3 {
+            text-align: center;
+            margin-bottom: 24px;
+            font-size: 1.1em;
+            color: var(--text);
+            font-weight: 600;
+        }
+
+        .flow-diagram {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 32px;
+            flex-wrap: wrap;
+        }
+
+        .flow-diagram--secondary {
+            opacity: 0.8;
+            border-top: 1px solid var(--card-border);
+            padding-top: 24px;
+            margin-bottom: 0;
+        }
+
+        .flow-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .flow-icon {
+            font-size: 28px;
+        }
+
+        .flow-label {
+            font-size: 0.9em;
+            font-weight: 600;
+            color: var(--text);
+            text-align: center;
+        }
+
+        .flow-sublabel {
+            font-size: 0.75em;
+            color: var(--muted);
+            text-align: center;
+        }
+
+        .flow-arrow {
+            font-size: 20px;
+            color: var(--muted);
+        }
+
+        /* Examples */
+        .example-section {
+            background: #0b1220;
+            border-radius: 12px;
+            padding: 24px;
+            border: 1px solid var(--card-border);
+        }
+
+        .example-section h3 {
+            margin-bottom: 20px;
+            font-size: 1.1em;
+            color: var(--text);
+            font-weight: 600;
+        }
+
+        .example h4 {
+            margin-bottom: 20px;
+            color: var(--warning);
+            font-size: 1em;
+            font-weight: 600;
+        }
+
+        .example-step {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .example-step:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .step-num {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: var(--accent);
+            color: #fff;
+            font-weight: 600;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .step-content {
+            flex: 1;
+        }
+
+        .step-title {
+            font-weight: 600;
+            color: var(--text);
+            margin: 0 0 8px 0;
+            font-size: 0.95em;
+        }
+
+        .step-detail {
+            font-size: 0.85em;
+            color: var(--muted);
+            margin: 0 0 12px 0;
+        }
+
+        .step-result {
+            background: #0b1220;
+            border: 1px solid var(--card-border);
+            padding: 10px;
+            border-radius: 10px;
+            font-size: 0.8em;
+            color: var(--text);
+            font-weight: 600;
+            line-height: 1.6;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero {
+                padding: 40px 20px;
+            }
+
+            .hero__title {
+                font-size: 32px;
+            }
+
+            .hero__subtitle {
+                font-size: 16px;
+            }
+
+            .hero__stats {
+                gap: 30px;
+            }
+
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .quick-amounts {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .container {
+                padding: 20px;
+            }
+
+            .card {
+                padding: 15px;
+            }
+
+            .balance-section {
+                grid-template-columns: 1fr;
+            }
+
+            .flow-diagram {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .flow-arrow {
+                transform: rotate(90deg);
+            }
+
+            .example-step {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .step-num {
+                width: 36px;
+                height: 36px;
+            }
+        }
+
+        @media (min-width: 1025px) {
+            .hero {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                text-align: left;
+            }
+
+            .hero__content {
+                flex: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="hero__content">
+                <div class="hero__eyebrow">Privacy Toolkit · 6 steps · ~7 min</div>
+                <h1 class="hero__title">Starknet Privacy Toolkit</h1>
+                <p class="hero__subtitle">
+                    A full-stack tutorial that combines Tongo private transfers and Garaga‑verified ZK badges.
+                    Create a private balance, transfer securely, then generate a proof‑backed badge on Sepolia.
+                </p>
+                <p class="text-muted" style="margin-top: 10px;">
+                    Demo only for educational purposes. Not production‑grade or audited, even though it uses audited tooling/libraries.
+                </p>
+                <div class="hero__actions">
+                    <a class="btn-primary" href="#quick-start">Start tutorial</a>
+                    <a class="btn-ghost" href="#security-faq">Security FAQ</a>
+                    <a class="btn-ghost" href="https://espejel.bearblog.dev/starknet-privacy-toolkit/" target="_blank" rel="noopener">Read Guide ↗</a>
+                </div>
+                <div class="hero__meta">
+                    <span>Private transfers</span>
+                    <span>Starknet-native</span>
+                    <span>ZK badges</span>
+                </div>
+                <div class="hero__links">
+                    <span>Made by Omar Espejel</span>
+                    <a href="https://x.com/omarespejel" target="_blank" rel="noopener noreferrer">@omarespejel</a>
+                    <a href="https://github.com/omarespejel" target="_blank" rel="noopener noreferrer">GitHub</a>
+                </div>
+            </div>
+        </section>
+        <!-- Quick Start Tutorial -->
+        <div class="card" id="quick-start" style="margin-bottom: 24px;">
+            <div class="card__header">
+                <h2>Quick Start (6 steps)</h2>
+                <p class="card__subtitle">Follow these steps in order for a smooth first run · <a href="https://espejel.bearblog.dev/starknet-privacy-toolkit/" target="_blank" rel="noopener" style="color: var(--accent);">Detailed guide ↗</a></p>
+            </div>
+            <ul class="tutorial-steps">
+                <li class="tutorial-step">
+                    <span class="step-index">Step 1</span>
+                    <span class="step-text">Connect your wallet and choose a network. Mainnet uses USDC; Sepolia uses STRK.</span>
+                </li>
+                <li class="tutorial-step">
+                    <span class="step-index">Step 2</span>
+                    <span class="step-text">Save your Tongo private key when prompted. Share your public key to receive private transfers.</span>
+                </li>
+                <li class="tutorial-step">
+                    <span class="step-index">Step 3</span>
+                    <span class="step-text">Fund your Tongo account to create a private balance. Funding is public; later transfers are private.</span>
+                </li>
+                <li class="tutorial-step">
+                    <span class="step-index">Step 4</span>
+                    <span class="step-text">Send a private transfer using the recipient’s Tongo public key. The amount is encrypted.</span>
+                </li>
+                <li class="tutorial-step">
+                    <span class="step-index">Step 5</span>
+                    <span class="step-text">If you receive funds, rollover pending to current. Withdraw from current balance to your wallet.</span>
+                </li>
+                <li class="tutorial-step">
+                    <span class="step-index">Step 6</span>
+                    <span class="step-text">Generate a Garaga‑verified badge proof on Sepolia to complete the privacy toolkit flow.</span>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Wallet Connection Panel -->
+        <div class="card" style="margin-bottom: 24px;">
+            <div class="card__header">
+                <h2>Step 1 · Wallet Connection</h2>
+                <p class="card__subtitle">Connect your Starknet wallet to start the tutorial flow</p>
+            </div>
+            <p class="text-muted" style="font-size: 0.85em; margin-bottom: 15px; line-height: 1.5;">
+                Connect Braavos or Argent X to sign transactions. Amounts remain <strong class="text-accent">private and encrypted</strong> using zero-knowledge proofs.
+            </p>
+            <div class="info-row">
+                <span class="label">Network:</span>
+                <select id="networkSelect">
+                    <option value="mainnet" selected>Mainnet</option>
+                    <option value="sepolia">Sepolia Testnet</option>
+                </select>
+            </div>
+            <div class="info-row" style="margin-top: 15px;">
+                <span class="label">Wallet:</span>
+                <div class="value" id="walletAddress">Not connected</div>
+            </div>
+            <button id="connectWalletBtn">Connect Wallet</button>
+            <button id="disconnectWalletBtn" class="hidden secondary danger">Disconnect</button>
+        </div>
+        
+        <!-- Account Overview -->
+        <div class="card" style="margin-bottom: 24px;">
+            <div class="card__header">
+                <h2>Step 2 · Key & Account Overview</h2>
+                <p class="card__subtitle">Save your Tongo key and share your public key to receive transfers</p>
+            </div>
+                <div class="info-row">
+                    <span class="label">Tongo Public Key:</span>
+                    <div class="value-row">
+                        <div class="value" id="publicKey">Not initialized</div>
+                        <div class="inline-actions">
+                            <button class="secondary small" onclick="copyPublicKey()" id="copyPublicKeyBtn" disabled>Copy</button>
+                            <button class="secondary small" onclick="showPublicKeyQr()" id="sharePublicKeyBtn" disabled>Share QR</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="info-row">
+                <span class="label">Starknet Address:</span>
+                <div class="value" id="starknetAddress">Not connected</div>
+                </div>
+                <div class="info-row">
+                <span class="label" id="walletBalanceLabel">Wallet Balance:</span>
+                <div class="value" id="walletBalance">-</div>
+                </div>
+                <div class="info-row">
+                <span class="label">Tongo Rate:</span>
+                <div class="value" id="tongoRate">-</div>
+                </div>
+            <button onclick="refreshState()" id="refreshBtn" disabled class="secondary">Refresh State</button>
+            </div>
+
+        <!-- Balance Explainer -->
+        <div class="balance-explainer">
+            <div class="balance-section">
+                <div class="balance-card balance-card--current">
+                    <div class="balance-header">
+                        <h3 class="balance-title">
+                            <span class="icon">[READY]</span>
+                            Current Balance
+                        </h3>
+                <p class="balance-subtitle">Balance YOU can send</p>
+                    </div>
+                    
+                    <div class="balance-value" id="currentBalanceDisplay">0.00 USDC</div>
+                    
+                    <div class="balance-description">
+                        <p class="description-text">
+                            This is your <strong>spendable</strong> encrypted balance. You can send private transfers
+                            from this amount right now.
+                        </p>
+                    </div>
+
+                    <div class="balance-action">
+                        <button class="secondary" onclick="document.getElementById('donationAmount').focus()">Send Transfer</button>
+                    </div>
+
+                    <details class="balance-details">
+                        <summary>How it works</summary>
+                        <ul>
+                            <li>You fund this account with USDC or STRK</li>
+                            <li>Amount is encrypted with ZK proofs</li>
+                            <li>You can send private transfers anytime</li>
+                            <li>Decreases each time you send</li>
+                        </ul>
+                    </details>
+                </div>
+
+                <div class="balance-card balance-card--pending">
+                    <div class="balance-header">
+                        <h3 class="balance-title">
+                            <span class="icon">[PENDING]</span>
+                            Pending Balance
+                        </h3>
+                <p class="balance-subtitle">Funds OTHERS sent to you</p>
+                    </div>
+                    
+                    <div class="balance-value" id="pendingBalanceDisplay">0.00 USDC</div>
+                    
+                    <div class="balance-description">
+                        <p class="description-text">
+                            This is encrypted money that <strong>other people sent to you</strong>. 
+                            You need to "rollover" it to use it.
+                        </p>
+                    </div>
+
+                    <div class="balance-action">
+                        <button class="secondary" onclick="rollover()" id="rolloverBtn" disabled>Rollover (nothing to rollover)</button>
+                    </div>
+                    
+                    <!-- Operation Status Feedback -->
+                    <div id="rolloverStatusBanner" class="operation-status" style="display: none;"></div>
+
+                    <details class="balance-details">
+                        <summary>How it works</summary>
+                        <ul>
+                            <li>Someone sends you a private transfer</li>
+                            <li>It arrives in your Pending balance</li>
+                            <li>Click "Rollover" to move it to Current balance</li>
+                            <li>Then you can spend it or send it forward</li>
+                            <li>Private flow stays intact end-to-end</li>
+                        </ul>
+                    </details>
+                </div>
+            </div>
+
+            <!-- Visual Flow Diagram -->
+            <div class="balance-flow">
+                <h3>How Transfers Flow Through Your Account</h3>
+                <div class="flow-diagram">
+                    <div class="flow-step">
+                        <div class="flow-icon">[FUND]</div>
+                        <div class="flow-label">You fund USDC</div>
+                    </div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-step">
+                        <div class="flow-icon">[ENCRYPT]</div>
+                        <div class="flow-label">Current Balance</div>
+                        <div class="flow-sublabel">(Ready to spend)</div>
+                    </div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-step">
+                        <div class="flow-icon">[SEND]</div>
+                        <div class="flow-label">Send Transfer</div>
+                        <div class="flow-sublabel">(Private)</div>
+                    </div>
+                </div>
+
+                <div class="flow-diagram flow-diagram--secondary">
+                    <div class="flow-step">
+                        <div class="flow-icon">[RECV]</div>
+                        <div class="flow-label">Receive Transfer</div>
+                        <div class="flow-sublabel">(Private)</div>
+                    </div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-step">
+                        <div class="flow-icon">[WAIT]</div>
+                        <div class="flow-label">Pending Balance</div>
+                        <div class="flow-sublabel">(Waiting)</div>
+                    </div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-step">
+                        <div class="flow-icon">[ROLL]</div>
+                        <div class="flow-label">Rollover</div>
+                        <div class="flow-sublabel">(Move to Current)</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid">
+            <!-- Fund Account -->
+            <div class="card">
+                <div class="card__header">
+                    <h2>Step 3 · Fund Private Balance</h2>
+                    <p class="card__subtitle">Transfer tokens into your Tongo account · <a href="https://espejel.bearblog.dev/starknet-privacy-toolkit/" target="_blank" rel="noopener" style="color: var(--accent);">Learn more ↗</a></p>
+                </div>
+                <p class="text-muted" style="font-size: 0.8em; margin-bottom: 15px; line-height: 1.4;">
+                    Transfer tokens from your connected wallet into your Tongo account to prepare for private transfers. 
+                    <span class="text-accent">Sepolia uses STRK tokens</span>, while 
+                    <span class="text-warning">Mainnet uses native USDC</span> (Circle's official USDC token).
+                    The funding transaction itself is public on-chain, 
+                    but once funds are in your Tongo account, all subsequent transfers using this balance are 
+                    <span class="text-warning">zero-knowledge encrypted</span> (amounts are hidden).
+                </p>
+                <div class="info-row">
+                    <span class="label">Token used for funding:</span>
+                    <div class="value" id="fundTokenLabel">-</div>
+                </div>
+                <div class="info-row">
+                    <span class="label">Token contract:</span>
+                    <div class="value" id="fundTokenAddress">-</div>
+                </div>
+                <p class="text-muted" id="fundTokenHint" style="font-size: 0.75em; margin: -6px 0 12px 0; display: none;"></p>
+                <input 
+                    type="number" 
+                    id="fundAmount" 
+                    placeholder="Amount" 
+                    min="0.1"
+                    step="0.1"
+                >
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <button onclick="approveTokenForTongo()" id="approveButton" class="secondary" style="flex: 1; min-width: 140px;">1. Approve Token</button>
+                    <button onclick="fundAccount()" id="fundButton" style="flex: 1; min-width: 140px;">2. Fund Account</button>
+                </div>
+                
+                <!-- Operation Status Feedback -->
+                <div id="fundStatusBanner" class="operation-status" style="display: none;"></div>
+                
+                <p class="text-muted" style="font-size: 0.75em; margin-top: 8px;">
+                    <strong>Tip:</strong> If funding fails with "NowOwner" error, click "Approve Token" first, wait for confirmation, then click "Fund Account".
+                </p>
+                <p class="privacy-notice">
+                    [+] Your transfer amount stays completely private<br>
+                    [+] No one sees your identity or transfer size<br>
+                    [+] Direct support to recipients
+                </p>
+            </div>
+
+            <!-- Send Transfer -->
+            <div class="card">
+                <div class="card__header">
+                    <h2>Step 4 · Send Private Transfer</h2>
+                    <p class="card__subtitle">Send privately to any recipient · <a href="https://espejel.bearblog.dev/starknet-privacy-toolkit/" target="_blank" rel="noopener" style="color: var(--accent);">Learn more ↗</a></p>
+                </div>
+                <p class="text-muted" style="font-size: 0.8em; margin-bottom: 15px; line-height: 1.4;">
+                    Send a private transfer using a recipient's Tongo public key. The transfer amount is 
+                    <span class="text-warning">zero-knowledge encrypted</span> on-chain, meaning only you and the recipient know the amount. 
+                    The transaction appears on-chain but the value is hidden using cryptographic proofs.
+                </p>
+                
+                <!-- Max amount display -->
+                <div class="max-row" style="margin-bottom: 10px;">
+                    <span class="text-muted">Available to send:</span>
+                    <span id="maxSendableAmount" class="max-value">--</span>
+                    <button onclick="setMaxSendAmount()" class="secondary small">MAX</button>
+                </div>
+                
+                <input 
+                    type="text" 
+                    id="recipientKey" 
+                    placeholder="Recipient Tongo Public Key (base58)"
+                >
+                <div id="recipientKeyStatus" class="input-status"></div>
+                <input 
+                    type="number" 
+                    id="donationAmount" 
+                    placeholder="Amount" 
+                    min="0.1"
+                    step="0.1"
+                >
+                <button onclick="sendDonation()" id="sendTransferBtn">Send Private Transfer</button>
+                
+                <!-- Operation Status Feedback -->
+                <div id="transferStatusBanner" class="operation-status" style="display: none;"></div>
+            </div>
+
+            <!-- Withdraw -->
+            <div class="card">
+                <div class="card__header">
+                    <h2>Step 5 · Withdraw Funds</h2>
+                    <p class="card__subtitle">Withdraw tokens from your private balance back to your wallet</p>
+                </div>
+                <p class="text-muted" style="font-size: 0.8em; margin-bottom: 15px; line-height: 1.4;">
+                    Withdraw tokens from your Tongo account back to your connected wallet. 
+                    Only funds in your Current Balance can be withdrawn. If you have a Pending Balance, 
+                    use the Rollover function first to move it to Current Balance before withdrawing.
+                </p>
+                <input 
+                    type="number" 
+                    id="withdrawAmount" 
+                    placeholder="Amount" 
+                    min="0.1"
+                    step="0.1"
+                >
+                <button onclick="withdraw()">Withdraw to Wallet</button>
+                <button onclick="ragequit()" id="ragequitBtn" class="secondary danger">Ragequit (Withdraw All)</button>
+                <p class="danger-hint">Emergency only: withdraws your full current balance in one tx.</p>
+            </div>
+
+            <!-- Badge Section - Full Width -->
+            <div class="card" id="badge-section" style="display: none; grid-column: 1 / -1;">
+                <div class="card__header">
+                    <h2>Step 6 · ZK Badge</h2>
+                    <p class="card__subtitle">Prove your transfer tier with zero-knowledge cryptography · <a href="https://espejel.bearblog.dev/starknet-privacy-toolkit/" target="_blank" rel="noopener" style="color: var(--accent);">How it works ↗</a></p>
+                </div>
+                
+                <!-- Network Notice -->
+                <div style="display: flex; align-items: center; gap: 8px; padding: 10px 14px; background: rgba(79, 70, 229, 0.1); border-radius: 8px; margin-bottom: 16px; font-size: 0.85em;">
+                    <span style="color: var(--accent);">ℹ️</span>
+                    <span class="text-muted">Badges run on <strong style="color: var(--text);">Sepolia testnet</strong> • Verified by <strong style="color: var(--accent);">Garaga</strong></span>
+                </div>
+                
+                <!-- Proof Backend URL Config -->
+                <div style="margin-bottom: 16px; padding: 14px; background: #1e1e2e; border-radius: 8px; border: 1px solid #3b3b5c;">
+                    <label for="proof-api-url" style="font-size: 0.95em; color: #e0e0e0; display: block; margin-bottom: 8px; font-weight: 600;">
+                        🔗 Proof API URL — paste your Codespaces URL below
+                    </label>
+                    <input 
+                        type="text" 
+                        id="proof-api-url" 
+                        placeholder="https://silver-train-xp77rg77x436j4r-3001.app.github.dev/"
+                        style="display: block; width: 100%; box-sizing: border-box; padding: 12px 14px; border-radius: 6px; border: 2px solid #4f46e5; background: #0d0d14; color: #ffffff; font-size: 0.95em; margin-bottom: 10px;"
+                    />
+                    <button onclick="saveProofApiUrl()" style="width: 100%; padding: 12px 16px; font-size: 0.95em; background: #4f46e5; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">
+                        Save Proof API URL
+                    </button>
+                    <div style="font-size: 0.8em; color: #a0a0b0; margin-top: 8px;">
+                        Example: <code style="background: #0d0d14; padding: 3px 8px; border-radius: 4px; color: #7dd3fc;">https://silver-train-xyz-3001.app.github.dev/</code>
+                        <br>Get this from Codespaces → <strong>Ports</strong> tab → port 3001 → make it <strong>Public</strong> → copy URL
+                    </div>
+                </div>
+
+                <!-- Proof Backend Status -->
+                <div id="proof-backend-status" class="badge-status-inline checking">
+                    <span class="status-dot"></span>
+                    <span><strong>Proof Server:</strong> Checking...</span>
+                </div>
+                
+                <!-- Badge Grid - Horizontal -->
+                <div class="badge-section-grid">
+                    <!-- Current Badge -->
+                    <div class="badge-current-card">
+                        <span id="badge-icon" class="badge-icon-large">⚪</span>
+                        <div>
+                            <div id="badge-name" class="badge-tier-name">No Badge</div>
+                            <div class="badge-description">Earn by proving transfers</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Tiers -->
+                    <div class="badge-tiers-preview">
+                        <div class="badge-tier-item" data-tier="1">
+                            <span class="tier-icon">🥉</span>
+                            <div class="tier-info">
+                                <div class="tier-name">Bronze</div>
+                                <div class="tier-threshold">$10+</div>
+                            </div>
+                        </div>
+                        <div class="badge-tier-item" data-tier="2">
+                            <span class="tier-icon">🥈</span>
+                            <div class="tier-info">
+                                <div class="tier-name">Silver</div>
+                                <div class="tier-threshold">$100+</div>
+                            </div>
+                        </div>
+                        <div class="badge-tier-item" data-tier="3">
+                            <span class="tier-icon">🥇</span>
+                            <div class="tier-info">
+                                <div class="tier-name">Gold</div>
+                                <div class="tier-threshold">$1000+</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Claim Badge Form -->
+                <div class="badge-claim-form">
+                    <h3>Generate Proof & Claim Badge</h3>
+                    <p class="text-muted" style="font-size: 0.85em; margin-bottom: 16px; line-height: 1.5;">
+                        Your actual transfer amount stays <strong style="color: var(--accent);">completely private</strong>. 
+                        The proof only reveals that you met the threshold.
+                    </p>
+                    
+                    <div class="form-group">
+                        <label>Badge Tier</label>
+                        <select id="badge-tier-select">
+                            <option value="1">🥉 Bronze — $10+ transfer</option>
+                            <option value="2">🥈 Silver — $100+ transfer</option>
+                            <option value="3">🥇 Gold — $1000+ transfer</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Transfer Amount (USD)</label>
+                        <input type="number" id="badge-donation-amount" placeholder="Your actual transfer amount" min="10" step="1" value="150">
+                        <small>🔒 Stays private — only used locally for proof generation</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Secret Passphrase</label>
+                        <input type="password" id="badge-secret" placeholder="A memorable phrase only you know" value="12345678">
+                        <small>🔑 Binds your identity to the badge — keep it safe!</small>
+                    </div>
+                    
+                    <button id="generate-badge-proof" onclick="generateBadgeProof()">
+                        Generate ZK Proof
+                    </button>
+                    
+                    <div id="badge-proof-status" class="badge-proof-result" style="display: none;">
+                        <div class="status-message"></div>
+                    </div>
+                    
+                    <button id="claim-badge-btn" onclick="claimBadge()" style="display: none; margin-top: 12px;">
+                        Claim Badge On-Chain
+                    </button>
+                </div>
+                
+                <!-- Verifier Contract Link (visible) -->
+                <div class="verifier-link" style="margin-top: 24px; padding: 16px; background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 12px;">
+                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                        <span style="color: #10b981;">✓</span>
+                        <strong style="color: var(--text); font-size: 0.95em;">On-Chain Verifier</strong>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                        <code style="font-size: 0.8em; color: var(--muted); word-break: break-all; flex: 1; min-width: 200px;">0x022b20fef3764d09293c5b377bc399ae7490e60665797ec6654d478d74212669</code>
+                        <a href="https://sepolia.starkscan.co/contract/0x022b20fef3764d09293c5b377bc399ae7490e60665797ec6654d478d74212669" 
+                           target="_blank" 
+                           rel="noopener" 
+                           style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 8px; color: #6ee7b7; text-decoration: none; font-size: 0.85em; white-space: nowrap;">
+                            View on Starkscan ↗
+                        </a>
+                    </div>
+                    <div style="margin-top: 10px; font-size: 0.8em; color: var(--muted);">
+                        Noir + Barretenberg (Ultra Honk) • Garaga-generated Cairo verifier
+                    </div>
+                </div>
+            </div>
+
+            <!-- Security & FAQ -->
+            <div class="card faq" id="security-faq">
+                <div class="card__header">
+                    <h2>Security & FAQ</h2>
+                    <p class="card__subtitle">How privacy works, what it doesn’t hide, and recovery options</p>
+                </div>
+                <details>
+                    <summary>How secure is this tutorial setup?</summary>
+                    <p>
+                        Tongo uses zero-knowledge proofs and encrypted balances on Starknet. Your transfer amounts stay private,
+                        but public metadata like wallet addresses, timing, and fund/withdraw amounts remain visible on-chain.
+                        Security depends on correct client usage and the underlying cryptography.
+                    </p>
+                </details>
+                <details>
+                    <summary>How does this compare to Tornado Cash?</summary>
+                    <p>
+                        Tornado Cash is a pool-based mixer on L1 with fixed denominations. Tongo is account-based on Starknet,
+                        with encrypted balances and private transfers. Both provide privacy for amounts, but on-chain metadata
+                        (addresses, timing) can still be observed. This tutorial uses direct wallet transactions (no relayers).
+                    </p>
+                </details>
+                <details>
+                    <summary>What if Tongo or this frontend disappears?</summary>
+                    <p>
+                        The contract stays on-chain. With your Tongo private key and any Starknet RPC, you can use the SDK/CLI
+                        to interact directly. If needed, use the <strong>Ragequit</strong> action to withdraw your full balance.
+                        Always back up your Tongo private key.
+                    </p>
+                </details>
+                <details>
+                    <summary>Can I bypass privacy or “disable” the security?</summary>
+                    <p>
+                        We don’t provide bypasses. If you need transparency, use a standard public transfer instead:
+                        withdraw from Tongo and then send tokens normally, or disclose details off-chain.
+                    </p>
+                </details>
+            </div>
+
+            <!-- Transaction Status -->
+            <div class="card">
+                <div class="card__header">
+                    <h2>Transaction Status</h2>
+                    <p class="card__subtitle">Current operation status</p>
+                </div>
+                <div id="status" class="status hidden"></div>
+            </div>
+            </div>
+
+            <!-- Logs -->
+            <div class="log-panel">
+            <h2 style="margin-bottom: 10px;">Operation Logs</h2>
+            <p class="text-muted" style="font-size: 0.8em; margin-bottom: 15px; line-height: 1.4;">
+                Detailed log of all private transfer operations, transactions, and status messages. Use this to track 
+                what's happening with your transfers and debug any issues. <span class="text-warning">All transfers are private and encrypted.</span>
+            </p>
+                <div id="logs"></div>
+            </div>
+    </div>
+
+    <!-- Tongo Key Backup Modal -->
+    <div id="keyBackupModal" class="modal">
+        <div class="modal-content">
+            <h2>IMPORTANT: Save Your Tongo Private Key</h2>
+            <p class="text-warning" style="margin-bottom: 15px;">
+                A new Tongo private key has been generated. <strong>You must save this key</strong> to access your Tongo account in the future.
+            </p>
+            <p class="text-danger" style="margin-bottom: 15px;">
+                WARNING: If you lose this key, you will lose access to your Tongo balance permanently!
+            </p>
+            <div class="key-display" id="modalKeyDisplay"></div>
+            <button onclick="copyTongoKey()">Copy Key</button>
+            <button onclick="downloadTongoKey()">Download as .txt</button>
+            <button onclick="closeKeyModal()" class="secondary">I've Saved It</button>
+        </div>
+    </div>
+
+    <!-- Tongo Public Key QR Modal -->
+    <div id="publicKeyQrModal" class="modal">
+        <div class="modal-content">
+            <h2>Share Your Tongo Public Key</h2>
+            <p class="text-muted" style="margin-bottom: 12px;">
+                Scan this QR code or copy the key to share your Tongo address.
+            </p>
+            <div class="key-display" id="publicKeyQrText"></div>
+            <div id="publicKeyQrContainer" class="qr-container"></div>
+            <button onclick="copyPublicKey()">Copy Public Key</button>
+            <button onclick="closePublicKeyQr()" class="secondary">Close</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { TongoService } from '../tongo-service.ts';
+        import { connectWallet as connectWalletSDK, disconnectWallet as disconnectWalletSDK, getConnectedAccount, createProvider, getNetworkConfig, NETWORKS } from '../wallet-config.ts';
+        import { getOrCreateTongoKey, hasTongoKey, saveTongoKey } from '../tongo-key-manager.ts';
+        import { BadgeService, BadgeTier } from '../badge-service.ts';
+        import { hash, RpcProvider } from 'starknet';
+        
+        let service = null;
+        let isInitialized = false;
+        let walletAccount = null;
+        let tongoPrivateKey = null;
+        let badgeService = null;
+
+        // Proof API URL helpers (localStorage-backed)
+        const DEFAULT_PROOF_API_URL = 'http://localhost:3001/api/generate-proof';
+        
+        function getProofApiUrl() {
+            return localStorage.getItem('proofApiUrl') || DEFAULT_PROOF_API_URL;
+        }
+        
+        function saveProofApiUrl() {
+            const input = document.getElementById('proof-api-url');
+            if (!input) return;
+            let url = input.value.trim();
+            if (!url) {
+                url = DEFAULT_PROOF_API_URL;
+                input.value = url;
+            }
+            // Ensure it ends with /api/generate-proof
+            if (!url.endsWith('/api/generate-proof')) {
+                url = url.replace(/\/$/, '') + '/api/generate-proof';
+                input.value = url;
+            }
+            localStorage.setItem('proofApiUrl', url);
+            console.log('[BADGE] Saved proof API URL:', url);
+            // Update badgeService if already initialized
+            if (badgeService) {
+                badgeService.setProofBackendUrl(url);
+            }
+            // Re-check health with new URL
+            checkProofBackendHealth();
+        }
+        
+        function loadProofApiUrlInput() {
+            const input = document.getElementById('proof-api-url');
+            if (input) {
+                input.value = getProofApiUrl();
+            }
+        }
+
+        // Expose for inline onclick handler
+        window.saveProofApiUrl = saveProofApiUrl;
+
+        // Debug helpers for console inspection
+        window._debug = {
+            get badgeService() { return badgeService; },
+            get walletAccount() { return walletAccount; },
+            get pendingBadgeProof() { return pendingBadgeProof; },
+            get currentNetwork() { return currentNetwork; }
+        };
+        /** @type {import('./badge-service.ts').BadgeProof | null} */
+        let pendingBadgeProof = null;
+        // Get current network from select or localStorage
+        function getCurrentNetwork() {
+            // Check localStorage first for persistence
+            const saved = localStorage.getItem('tongo-network');
+            if (saved && (saved === 'sepolia' || saved === 'mainnet')) {
+                // Update select element to match
+                const select = document.getElementById('networkSelect');
+                if (select && select.value !== saved) {
+                    select.value = saved;
+                }
+                return saved;
+            }
+            
+            // Fallback to select element
+            const select = document.getElementById('networkSelect');
+            if (select) {
+                const value = select.value;
+                localStorage.setItem('tongo-network', value); // Save it
+                return value;
+            }
+            
+            return 'mainnet'; // Default
+        }
+        
+        // Initialize currentNetwork from localStorage or default
+        let currentNetwork = getCurrentNetwork();
+
+        // Debug helper: Check token balance directly from RPC
+        async function debugTokenBalance() {
+            try {
+                if (!walletAccount) {
+                    console.log('[DEBUG-BALANCE] No walletAccount yet');
+                    return;
+                }
+                
+                const networkConfig = getNetworkConfig(currentNetwork);
+                const provider = createProvider(currentNetwork);
+                
+                console.log('[DEBUG-BALANCE] Starting token balance debug...', {
+                    currentNetwork,
+                    walletAddress: walletAccount.address,
+                    rpcUrl: networkConfig.rpcUrl,
+                    tokenAddress: networkConfig.strkAddress,
+                    tongoContractAddress: networkConfig.tongoContractAddress,
+                });
+                
+                // Call ERC20 balanceOf(wallet)
+                const res = await provider.callContract({
+                    contractAddress: networkConfig.strkAddress,
+                    entrypoint: 'balanceOf',
+                    calldata: [walletAccount.address],
+                });
+                
+                console.log('[DEBUG-BALANCE] Raw balanceOf response:', res);
+                
+                // Standard Uint256: [low, high]
+                const result = res.result || res;
+                const [low, high] = Array.isArray(result) ? result : [result, '0x0'];
+                const lowBn = BigInt(low);
+                const highBn = BigInt(high);
+                const raw = lowBn + (highBn << 128n);
+                
+                const tokenDecimals = currentNetwork === 'mainnet' ? 6 : 18;
+                const human = Number(raw) / Math.pow(10, tokenDecimals);
+                
+                console.log('[DEBUG-BALANCE] Parsed token balance:', {
+                    raw: raw.toString(),
+                    decimals: tokenDecimals,
+                    humanReadable: human,
+                    token: currentNetwork === 'mainnet' ? 'USDC' : 'STRK',
+                });
+                
+                return {
+                    raw: raw.toString(),
+                    decimals: tokenDecimals,
+                    humanReadable: human,
+                    token: currentNetwork === 'mainnet' ? 'USDC' : 'STRK',
+                };
+            } catch (e) {
+                console.error('[DEBUG-BALANCE] Failed to fetch token balance', e);
+                throw e;
+            }
+        }
+
+        // Add log entry
+        function addLog(message, type = 'info') {
+            const logDiv = document.getElementById('logs');
+            if (!logDiv) {
+                console.log(`[LOG ${type.toUpperCase()}]`, message);
+                return;
+            }
+            const entry = document.createElement('div');
+            entry.className = `log-entry log-${type}`;
+            entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            logDiv.appendChild(entry);
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+
+        // Set status message
+        function setStatus(message, type = 'info') {
+            const status = document.getElementById('status');
+            if (!status) return;
+            status.textContent = message;
+            status.className = `status ${type}`;
+            status.classList.remove('hidden');
+        }
+
+        /**
+         * Show operation status banner for a specific step
+         * @param {string} bannerId - The ID of the banner element
+         * @param {string} type - 'loading' | 'success' | 'error'
+         * @param {string} message - The message to display
+         * @param {string} [txHash] - Optional transaction hash for link
+         */
+        function showOperationStatus(bannerId, type, message, txHash = null) {
+            const banner = document.getElementById(bannerId);
+            if (!banner) return;
+            
+            const icons = {
+                loading: '⏳',
+                success: '✅',
+                error: '❌'
+            };
+            
+            let html = `
+                <span class="status-icon">${icons[type] || '📋'}</span>
+                <span class="status-message">${message}</span>
+            `;
+            
+            if (txHash && type === 'success') {
+                const explorerUrl = currentNetwork === 'mainnet' 
+                    ? `https://starkscan.co/tx/${txHash}`
+                    : `https://sepolia.starkscan.co/tx/${txHash}`;
+                html += `<a href="${explorerUrl}" target="_blank" class="status-link">View TX →</a>`;
+            }
+            
+            banner.innerHTML = html;
+            banner.className = `operation-status ${type}`;
+            banner.style.display = 'flex';
+        }
+        
+        function hideOperationStatus(bannerId) {
+            const banner = document.getElementById(bannerId);
+            if (banner) {
+                banner.style.display = 'none';
+            }
+        }
+
+        // Generate and show Tongo key backup modal
+        function showKeyBackupModal(key) {
+            const modal = document.getElementById('keyBackupModal');
+            const keyDisplay = document.getElementById('modalKeyDisplay');
+            keyDisplay.textContent = key;
+            modal.classList.add('active');
+            addLog('WARNING: New Tongo key generated. Please save it!', 'warn');
+        }
+
+        // Close key backup modal
+        window.closeKeyModal = function() {
+            const modal = document.getElementById('keyBackupModal');
+            modal.classList.remove('active');
+            addLog('Key backup modal closed', 'info');
+        }
+
+        // Copy Tongo key to clipboard
+        window.copyTongoKey = async function() {
+            const keyDisplay = document.getElementById('modalKeyDisplay');
+            const key = keyDisplay.textContent;
+            try {
+                await navigator.clipboard.writeText(key);
+                addLog('Tongo key copied to clipboard', 'success');
+                alert('Key copied to clipboard!');
+            } catch (error) {
+                addLog(`Failed to copy key: ${error.message}`, 'error');
+            }
+        }
+
+        // Download Tongo key as file
+        window.downloadTongoKey = function() {
+            const keyDisplay = document.getElementById('modalKeyDisplay');
+            const key = keyDisplay.textContent;
+            const blob = new Blob([`TONGO_PRIVATE_KEY=${key}\n\n⚠️ IMPORTANT: Keep this file secure!\n⚠️ If you lose this key, you lose access to your Tongo account!`], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'tongo-private-key.txt';
+            a.click();
+            URL.revokeObjectURL(url);
+            addLog('Key downloaded', 'success');
+        }
+
+        // Show Tongo public key QR modal
+        window.showPublicKeyQr = function() {
+            const modal = document.getElementById('publicKeyQrModal');
+            const keyEl = document.getElementById('publicKey');
+            const key = service?.getPublicKey?.() || keyEl?.textContent?.trim();
+            if (!key || key === 'Not initialized' || key.startsWith('Error')) {
+                addLog('Public key not available yet. Connect wallet first.', 'warn');
+                return;
+            }
+            const qrText = document.getElementById('publicKeyQrText');
+            if (qrText) qrText.textContent = key;
+            const qrContainer = document.getElementById('publicKeyQrContainer');
+            if (qrContainer) {
+                qrContainer.innerHTML = `
+                    <img 
+                        src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(key)}" 
+                        alt="Tongo Public Key QR Code"
+                        style="width: 220px; height: 220px; border-radius: 8px;"
+                    />
+                `;
+            }
+            modal.classList.add('active');
+        }
+
+        // Close public key QR modal
+        window.closePublicKeyQr = function() {
+            const modal = document.getElementById('publicKeyQrModal');
+            modal.classList.remove('active');
+        }
+
+        // Copy public key to clipboard
+        window.copyPublicKey = async function() {
+            const key = service?.getPublicKey?.() || document.getElementById('publicKey')?.textContent?.trim();
+            if (!key || key === 'Not initialized') {
+                addLog('Public key not available yet. Connect wallet first.', 'warn');
+                return;
+            }
+            try {
+                await navigator.clipboard.writeText(key);
+                addLog('Public key copied to clipboard', 'success');
+            } catch (error) {
+                addLog(`Failed to copy public key: ${error.message}`, 'error');
+            }
+        }
+
+        // Recipient key validation helpers
+        function setRecipientKeyStatus(message, status = '') {
+            const statusEl = document.getElementById('recipientKeyStatus');
+            if (!statusEl) return;
+            statusEl.textContent = message;
+            statusEl.className = `input-status${status ? ` ${status}` : ''}`;
+        }
+
+        function basicRecipientKeyFormatError(value) {
+            const trimmed = value.trim();
+            if (!trimmed) return '';
+            if (trimmed.startsWith('0x')) {
+                const hex = trimmed.slice(2);
+                if (!/^[0-9a-fA-F]+$/.test(hex)) {
+                    return 'Invalid hex characters in public key.';
+                }
+                if (hex.length !== 128) {
+                    return 'Hex key must be 128 chars (x+y) or use base58.';
+                }
+            } else {
+                const base58Re = /^[1-9A-HJ-NP-Za-km-z]+$/;
+                if (!base58Re.test(trimmed)) {
+                    return 'Invalid base58 characters in public key.';
+                }
+            }
+            return '';
+        }
+
+        function validateRecipientKeyInput(value) {
+            const trimmed = value.trim();
+            if (!trimmed) {
+                setRecipientKeyStatus('');
+                return { valid: false };
+            }
+
+            const basicError = basicRecipientKeyFormatError(trimmed);
+            if (basicError) {
+                setRecipientKeyStatus(basicError, 'invalid');
+                return { valid: false, error: basicError };
+            }
+
+            if (service?.validatePublicKeyFormat) {
+                const result = service.validatePublicKeyFormat(trimmed);
+                if (!result.valid) {
+                    setRecipientKeyStatus(result.error || 'Invalid public key.', 'invalid');
+                    return { valid: false, error: result.error || 'Invalid public key.' };
+                }
+                setRecipientKeyStatus('Valid Tongo public key', 'valid');
+                return { valid: true };
+            }
+
+            setRecipientKeyStatus('Format looks ok (connect wallet to fully validate)', 'warn');
+            return { valid: true };
+        }
+
+        // Connect wallet
+        window.connectWallet = async function() {
+            let loadingInterval = null;
+            try {
+                console.log('[CONNECT] Connect button clicked...');
+                addLog('Connect wallet button clicked', 'info');
+                setStatus('Opening wallet modal...', 'loading');
+                addLog('Connecting to wallet...', 'info');
+                addLog('Tip: Braavos is faster than Ready wallet', 'warn');
+                
+                // Show loading indicator that updates
+                let loadingCounter = 0;
+                loadingInterval = setInterval(() => {
+                    loadingCounter++;
+                    const statusEl = document.getElementById('status');
+                    if (statusEl) {
+                        if (loadingCounter < 5) {
+                            statusEl.textContent = 'Opening wallet modal...';
+                        } else if (loadingCounter < 10) {
+                            statusEl.textContent = 'Waiting for wallet selection...';
+                        } else {
+                            statusEl.textContent = 'Still waiting... (Ready wallet is slower - try Braavos)';
+                        }
+                    }
+                }, 1000);
+                
+                // Check if get-starknet is available
+                if (typeof window === 'undefined') {
+                    throw new Error('Not in browser environment');
+                }
+                
+                currentNetwork = getCurrentNetwork();
+                console.log('[CONNECT] Current network:', currentNetwork);
+                addLog(`Network: ${currentNetwork}`, 'info');
+                
+                console.log('[CONNECT] Calling connectWalletSDK...');
+                walletAccount = await connectWalletSDK();
+                
+                // Clear loading indicator
+                if (loadingInterval) {
+                    clearInterval(loadingInterval);
+                    loadingInterval = null;
+                }
+                
+                console.log('[CONNECT] Wallet account received:', walletAccount);
+                
+                if (!walletAccount) {
+                    addLog('Wallet connection cancelled by user', 'warn');
+                    setStatus('Connection cancelled', 'error');
+                    return;
+                }
+
+                // CRITICAL: Verify account address format
+                if (!walletAccount.address || typeof walletAccount.address !== 'string') {
+                    throw new Error('Invalid wallet account: missing address');
+                }
+                
+                if (!walletAccount.address.startsWith('0x')) {
+                    throw new Error('Invalid wallet account address format: must start with 0x');
+                }
+                
+                // Pad address for DISPLAY/LOGGING only - don't modify the actual object!
+                // Some wallets return 65-character addresses (0x + 63 hex chars)
+                const originalAddress = walletAccount.address;
+                const paddedAddress = '0x' + originalAddress.slice(2).padStart(64, '0');
+                
+                console.log('[CONNECT] Address info:', {
+                    original: originalAddress,
+                    originalLength: originalAddress.length,
+                    padded: paddedAddress,
+                    paddedLength: paddedAddress.length
+                });
+                
+                // DON'T modify walletAccount.address - wallet uses original format internally!
+                // walletAccount.address = paddedAddress;  // ❌ REMOVED - causes mismatch with wallet's internal address
+                
+                console.log('[CONNECT] Using wallet\'s original address:', walletAccount.address);
+                console.log('[CONNECT] Wallet address validated:', {
+                    address: walletAccount.address,
+                    length: walletAccount.address.length,
+                    startsWith0x: walletAccount.address.startsWith('0x')
+                });
+
+                console.log('[CONNECT] Wallet connected successfully');
+                addLog(`Wallet connected: ${walletAccount.address.slice(0, 10)}...`, 'success');
+                
+                // Update UI (use original wallet address)
+                document.getElementById('walletAddress').textContent = 
+                    `${walletAccount.address.slice(0, 10)}...${walletAccount.address.slice(-8)}`;
+                document.getElementById('connectWalletBtn').classList.add('hidden');
+                document.getElementById('disconnectWalletBtn').classList.remove('hidden');
+                
+                // Initialize Tongo service
+                await initializeTongoService();
+                
+            } catch (error) {
+                // Clear loading indicator on error
+                if (loadingInterval) {
+                    clearInterval(loadingInterval);
+                    loadingInterval = null;
+                }
+                
+                const errorMsg = error instanceof Error ? error.message : String(error);
+                const errorStack = error instanceof Error ? error.stack : '';
+                console.error('[CONNECT] Connection failed:', error);
+                console.error('[CONNECT] Error stack:', errorStack);
+                addLog(`Connection failed: ${errorMsg}`, 'error');
+                
+                // Suggest Braavos if Ready was slow
+                if (errorMsg.includes('timeout') || errorMsg.includes('slow') || errorMsg.includes('Ready')) {
+                    addLog('Try using Braavos wallet instead - it\'s faster!', 'warn');
+                    addLog('Braavos typically connects in 2-5 seconds', 'info');
+                }
+                
+                addLog('Check browser console (F12) for details', 'info');
+                setStatus('Connection failed', 'error');
+            }
+        };
+
+        // Attach event listeners to buttons (after functions are defined)
+        function attachButtonListeners() {
+            const connectBtn = document.getElementById('connectWalletBtn');
+            const disconnectBtn = document.getElementById('disconnectWalletBtn');
+            
+            if (connectBtn && !connectBtn.dataset.listenerAttached) {
+                connectBtn.addEventListener('click', () => {
+                    window.connectWallet();
+                });
+                connectBtn.dataset.listenerAttached = 'true';
+            }
+            
+            if (disconnectBtn && !disconnectBtn.dataset.listenerAttached) {
+                disconnectBtn.addEventListener('click', () => {
+                    window.disconnectWallet();
+                });
+                disconnectBtn.dataset.listenerAttached = 'true';
+            }
+        }
+
+        // Disconnect wallet
+        window.disconnectWallet = async function() {
+            try {
+                await disconnectWalletSDK();
+                walletAccount = null;
+                service = null;
+                isInitialized = false;
+                
+                document.getElementById('walletAddress').textContent = 'Not connected';
+                document.getElementById('connectWalletBtn').classList.remove('hidden');
+                document.getElementById('disconnectWalletBtn').classList.add('hidden');
+                document.getElementById('starknetAddress').textContent = 'Not connected';
+                document.getElementById('publicKey').textContent = 'Not initialized';
+                document.getElementById('tongoRate').textContent = '-';
+                const fundTokenLabel = document.getElementById('fundTokenLabel');
+                const fundTokenAddress = document.getElementById('fundTokenAddress');
+                const fundTokenHint = document.getElementById('fundTokenHint');
+                if (fundTokenLabel) fundTokenLabel.textContent = '-';
+                if (fundTokenAddress) fundTokenAddress.textContent = '-';
+                if (fundTokenHint) {
+                    fundTokenHint.textContent = '';
+                    fundTokenHint.style.display = 'none';
+                }
+                const copyPublicKeyBtn = document.getElementById('copyPublicKeyBtn');
+                const sharePublicKeyBtn = document.getElementById('sharePublicKeyBtn');
+                if (copyPublicKeyBtn) copyPublicKeyBtn.disabled = true;
+                if (sharePublicKeyBtn) sharePublicKeyBtn.disabled = true;
+                const ragequitBtn = document.getElementById('ragequitBtn');
+                if (ragequitBtn) {
+                    ragequitBtn.disabled = true;
+                    ragequitBtn.textContent = 'Ragequit (Withdraw All)';
+                }
+                const recipientKeyStatus = document.getElementById('recipientKeyStatus');
+                if (recipientKeyStatus) {
+                    recipientKeyStatus.textContent = '';
+                    recipientKeyStatus.className = 'input-status';
+                }
+                const tokenName = currentNetwork === 'mainnet' ? 'USDC' : 'STRK';
+                document.getElementById('currentBalanceDisplay').textContent = `0.00 ${tokenName}`;
+                document.getElementById('pendingBalanceDisplay').textContent = `0.00 ${tokenName}`;
+                document.getElementById('rolloverBtn').disabled = true;
+                document.getElementById('rolloverBtn').textContent = 'Rollover (nothing to rollover)';
+                
+                // Disable buttons
+                document.getElementById('refreshBtn').disabled = true;
+                
+                addLog('Wallet disconnected', 'info');
+                setStatus('Disconnected', 'success');
+            } catch (error) {
+                addLog(`Disconnect failed: ${error.message}`, 'error');
+            }
+        };
+
+        // Initialize Tongo service
+        async function initializeTongoService() {
+            try {
+                if (!walletAccount) {
+                    throw new Error('Wallet not connected');
+                }
+
+                setStatus('Initializing Tongo service...', 'loading');
+                addLog('Initializing Tongo service...', 'info');
+
+                // Get or create Tongo private key
+                const hadKey = hasTongoKey();
+                console.log('[INIT] Has existing Tongo key:', hadKey);
+                
+                tongoPrivateKey = getOrCreateTongoKey();
+                console.log('[INIT] Tongo key:', tongoPrivateKey ? `${tongoPrivateKey.slice(0, 10)}...` : 'NOT SET');
+                
+                // Validate key format
+                if (!tongoPrivateKey || !tongoPrivateKey.startsWith('0x') || tongoPrivateKey.length !== 66) {
+                    throw new Error('Invalid Tongo private key format. Key must be 0x followed by 64 hex characters.');
+                }
+                
+                // Show backup modal if new key was generated
+                if (!hadKey) {
+                    console.log('[INIT] New key generated, showing backup modal');
+                    showKeyBackupModal(tongoPrivateKey);
+                }
+
+                // Get network config
+                const networkConfig = getNetworkConfig(currentNetwork);
+                const provider = createProvider(currentNetwork);
+
+                // NEW: Detailed network config logging
+                console.log('[INIT] Network config:', {
+                    currentNetwork,
+                    rpcUrl: networkConfig.rpcUrl,
+                    chainId: networkConfig.chainId,
+                    tongoContractAddress: networkConfig.tongoContractAddress,
+                    tokenAddress: networkConfig.strkAddress,
+                });
+
+                // Network sanity check (prevent wrong RPC/network mismatch)
+                try {
+                    const chainId = await provider.getChainId();
+                    if (chainId !== networkConfig.chainId) {
+                        const warning = `RPC chainId mismatch: expected ${networkConfig.chainId}, got ${chainId}`;
+                        console.warn('[INIT] ' + warning);
+                        addLog(`[WARN] ${warning}`, 'warn');
+                    }
+                } catch (chainError) {
+                    console.warn('[INIT] Could not verify chainId:', chainError);
+                }
+
+                console.log('[INIT] Wallet account for TongoService:', {
+                    address: walletAccount.address,
+                    addressLength: walletAccount.address.length,
+                });
+
+                console.log('[INIT] Creating TongoService with:', {
+                    wallet: walletAccount.address,
+                    network: currentNetwork,
+                    tongoContract: networkConfig.tongoContractAddress,
+                    token: networkConfig.strkAddress,
+                    keyPrefix: tongoPrivateKey.slice(0, 10),
+                });
+
+                // CRITICAL: Use wallet's ORIGINAL address (don't pad!)
+                // The wallet sends transactions with its original address format
+                // SDK must use the same format to match the transaction sender
+                console.log('[INIT] Verifying wallet account consistency...', {
+                    walletAccountAddress: walletAccount.address,
+                    walletAddressLength: walletAccount.address.length,
+                    walletAccountType: typeof walletAccount,
+                    isAccount: walletAccount instanceof Object,
+                });
+                
+                // Create Tongo service (will validate key internally)
+                // Pass wallet's ORIGINAL address (not padded) - SDK will use it as-is
+                service = new TongoService(
+                    walletAccount.address,  // Use wallet's original address format
+                    walletAccount,
+                    provider,
+                    networkConfig.tongoContractAddress,
+                    networkConfig.strkAddress,
+                    tongoPrivateKey
+                );
+                
+                console.log('[INIT] TongoService created successfully');
+                
+                // Verify addresses match after service creation
+                // Access private properties safely
+                const serviceAny = service;
+                const serviceAddress = serviceAny.starknetAccount?.address;
+                const serviceStarknetAddress = serviceAny.starknetAddress;
+                
+                // Pad addresses for comparison (consistent with TongoService padding)
+                const padAddr = (addr) => addr ? '0x' + addr.slice(2).padStart(64, '0') : null;
+                const paddedWalletAddr = padAddr(walletAccount.address);
+                const paddedServiceAddr = padAddr(serviceAddress);
+                const paddedServiceStarknetAddr = padAddr(serviceStarknetAddress);
+                
+                console.log('[INIT] Address verification (padded):', {
+                    walletAccountAddress: walletAccount.address,
+                    paddedWalletAddress: paddedWalletAddr,
+                    serviceStarknetAddress: serviceStarknetAddress,
+                    paddedServiceStarknetAddress: paddedServiceStarknetAddr,
+                    serviceAccountAddress: serviceAddress,
+                    paddedServiceAccountAddress: paddedServiceAddr,
+                    addressesMatch: paddedWalletAddr?.toLowerCase() === paddedServiceAddr?.toLowerCase(),
+                });
+                
+                if (paddedWalletAddr?.toLowerCase() !== paddedServiceAddr?.toLowerCase()) {
+                    console.error('[INIT] ⚠️ ADDRESS MISMATCH DETECTED!', {
+                        wallet: paddedWalletAddr,
+                        service: paddedServiceAddr,
+                    });
+                    addLog('⚠️ Warning: Wallet address mismatch detected. This may cause "NotOwner" errors.', 'warn');
+                }
+
+                // Refresh state
+                await service.refreshState();
+                await updateState();
+                
+                // Enable buttons
+                document.getElementById('refreshBtn').disabled = false;
+                
+                isInitialized = true;
+                addLog(`Tongo service initialized. Public Key: ${service.getPublicKey().slice(0, 20)}...`, 'success');
+                setStatus('Ready', 'success');
+                
+                // Initialize badge service
+                await initBadgeService();
+                
+            } catch (error) {
+                const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+                const errorStack = error instanceof Error ? error.stack : '';
+                console.error('[INIT] Tongo service init error:', error);
+                console.error('[INIT] Error stack:', errorStack);
+                
+                addLog(`Tongo service initialization failed: ${errorMsg}`, 'error');
+                
+                // Provide helpful error messages
+                if (errorMsg.includes('scalar') || errorMsg.includes('valid range')) {
+                    addLog('Your Tongo key is invalid. Generating a new one...', 'warn');
+                    // Clear invalid key and regenerate
+                    if (typeof window !== 'undefined') {
+                        localStorage.removeItem('tongo_private_key');
+                        addLog('Please refresh the page to generate a new key', 'info');
+                    }
+                } else if (errorMsg.includes('key')) {
+                    addLog('Key validation failed. Check browser console for details.', 'warn');
+                }
+                
+                setStatus('Initialization failed', 'error');
+            }
+        }
+
+        // Check for existing wallet connection on load (silent - no popups)
+        async function checkExistingConnection() {
+            try {
+                console.log('[APP] Checking for existing wallet connection (silent)...');
+                
+                // Small delay to let wallet extensions fully initialize
+                await new Promise(r => setTimeout(r, 500));
+                
+                walletAccount = await getConnectedAccount();
+                
+                if (walletAccount && walletAccount.address) {
+                    console.log('[APP] Found existing connection:', walletAccount.address);
+                    addLog('Found existing wallet connection', 'info');
+                    document.getElementById('walletAddress').textContent = 
+                        `${walletAccount.address.slice(0, 10)}...${walletAccount.address.slice(-8)}`;
+                    document.getElementById('connectWalletBtn').classList.add('hidden');
+                    document.getElementById('disconnectWalletBtn').classList.remove('hidden');
+                    
+                    await initializeTongoService();
+                    
+                    // Initialize badge service
+                    await initBadgeService();
+                } else {
+                    console.log('[APP] No existing connection found');
+                    addLog('Connect your wallet to start', 'info');
+                }
+            } catch (error) {
+                console.error('[APP] Error checking existing connection:', error);
+                addLog('Connect your wallet to start', 'info');
+            }
+        }
+
+        // Global error handlers (only log to console if addLog not ready)
+        window.addEventListener('error', (e) => {
+            console.error('[GLOBAL ERROR]', e.error);
+            if (typeof addLog === 'function') {
+                addLog(`Global error: ${e.error?.message || e.message}`, 'error');
+            }
+        });
+
+        window.addEventListener('unhandledrejection', (e) => {
+            console.error('[UNHANDLED REJECTION]', e.reason);
+            if (typeof addLog === 'function') {
+                addLog(`Unhandled promise rejection: ${e.reason?.message || String(e.reason)}`, 'error');
+            }
+        });
+
+        // Wallet module will be loaded lazily when user clicks Connect
+        // Pre-loading disabled to prevent unwanted wallet popups
+
+        // Attach button listeners immediately
+        attachButtonListeners();
+        
+        // Also attach on DOMContentLoaded in case script runs before DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', attachButtonListeners);
+        }
+
+        // Initialize on load
+        window.addEventListener('load', async () => {
+            try {
+                console.log('[APP] Page loaded, initializing...');
+                addLog('Privacy Toolkit loaded', 'info');
+                
+                // Ensure button listeners are attached
+                attachButtonListeners();
+                
+                // Load stored proof API URL into input field
+                loadProofApiUrlInput();
+                
+                // Check if auto-reconnect is disabled (for debugging)
+                const disableAutoReconnect = localStorage.getItem('tongo-disable-auto-reconnect') === 'true';
+                if (disableAutoReconnect) {
+                    console.log('[APP] Auto-reconnect disabled (set via localStorage)');
+                    addLog('Click "Connect Wallet" to start', 'info');
+                } else {
+                    // Silent check for existing connection - no popups
+                    await checkExistingConnection();
+                }
+            } catch (error) {
+                console.error('[APP] Initialization error:', error);
+                addLog(`Init error: ${error instanceof Error ? error.message : String(error)}`, 'error');
+            }
+        });
+
+        // Also expose functions for debugging
+        window.debugTongo = {
+            service,
+            walletAccount,
+            isInitialized: () => isInitialized,
+            getState: () => service?.getState(),
+            refreshState: () => service?.refreshState(),
+            connectWallet: window.connectWallet,
+            disconnectWallet: window.disconnectWallet,
+            currentNetwork: () => currentNetwork,
+            debugTokenBalance,
+            debugLogWallet: () => {
+                // Access private properties safely without TypeScript assertions
+                const serviceAny = service;
+                const serviceAddress = serviceAny ? serviceAny.starknetAccount?.address : null;
+                const serviceStarknetAddress = serviceAny ? serviceAny.starknetAddress : null;
+                const walletAddress = walletAccount?.address;
+                
+                console.log('[DEBUG-WALLET] Wallet Debug Info:', {
+                    walletAccount: walletAccount,
+                    walletAddress: walletAddress,
+                    serviceStarknetAddress: serviceStarknetAddress,
+                    serviceAccountAddress: serviceAddress,
+                    addressesMatch: walletAddress && serviceAddress 
+                        ? walletAddress.toLowerCase() === serviceAddress.toLowerCase() 
+                        : false,
+                    currentNetwork,
+                });
+                
+                // Check for address mismatches
+                if (walletAddress && serviceAddress && walletAddress.toLowerCase() !== serviceAddress.toLowerCase()) {
+                    console.error('[DEBUG-WALLET] ⚠️ ADDRESS MISMATCH!', {
+                        wallet: walletAddress,
+                        service: serviceAddress,
+                    });
+                }
+            },
+            // Helper to check address consistency
+            checkAddressConsistency: () => {
+                if (!service || !walletAccount) {
+                    console.log('[DEBUG] Service or wallet not initialized');
+                    return false;
+                }
+                const serviceAny = service;
+                const serviceAddress = serviceAny.starknetAccount?.address;
+                const walletAddress = walletAccount.address;
+                const match = serviceAddress?.toLowerCase() === walletAddress.toLowerCase();
+                console.log('[DEBUG] Address Consistency Check:', {
+                    walletAddress,
+                    serviceAddress,
+                    match: match ? '[OK] MATCH' : '[ERROR] MISMATCH',
+                });
+                return match;
+            },
+            walletAccount,
+            isInitialized,
+            currentNetwork,
+            getState: () => service?.getState(),
+            refreshState: () => service?.refreshState(),
+            connectWallet: window.connectWallet,
+            disconnectWallet: window.disconnectWallet
+        };
+
+        // Separate approve function to work around multicall simulation issues
+        window.approveTokenForTongo = async function() {
+            if (!isInitialized || !service || !walletAccount) {
+                addLog('Service not initialized. Please connect wallet first.', 'error');
+                setStatus('Connect wallet first', 'error');
+                return;
+            }
+
+            const amountInput = parseFloat(document.getElementById('fundAmount').value);
+            if (!amountInput || amountInput <= 0) {
+                addLog('Enter a valid amount first (e.g., 1 for 1 USDC)', 'error');
+                return;
+            }
+
+            try {
+                const networkConfig = getNetworkConfig(currentNetwork);
+                const tokenName = currentNetwork === 'mainnet' ? 'USDC' : 'STRK';
+                const tokenDecimals = currentNetwork === 'mainnet' ? 6 : 18;
+                
+                // Convert to token units and add 10% buffer for safety
+                const amountToken = BigInt(Math.floor(amountInput * Math.pow(10, tokenDecimals) * 1.1));
+                
+                setStatus('Approving...', 'loading');
+                addLog(`[APPROVE] Approving ${amountInput.toFixed(2)} ${tokenName} (+ 10% buffer) for Tongo contract...`, 'info');
+                addLog(`[APPROVE] Token: ${networkConfig.strkAddress}`, 'info');
+                addLog(`[APPROVE] Spender: ${networkConfig.tongoContractAddress}`, 'info');
+                
+                // Build approve call manually
+                const approveCall = {
+                    contractAddress: networkConfig.strkAddress,
+                    entrypoint: 'approve',
+                    calldata: [
+                        networkConfig.tongoContractAddress, // spender
+                        amountToken.toString(), // amount low
+                        '0' // amount high
+                    ]
+                };
+                
+                addLog('Please confirm the approve transaction in your wallet...', 'info');
+                
+                const tx = await walletAccount.execute([approveCall]);
+                
+                addLog(`[OK] Approve tx submitted! Hash: ${tx.transaction_hash.slice(0, 20)}...`, 'success');
+                const explorerUrl = currentNetwork === 'mainnet' 
+                    ? `https://starkscan.co/tx/${tx.transaction_hash}` 
+                    : `https://sepolia.starkscan.co/tx/${tx.transaction_hash}`;
+                addLog(`View on Starkscan: ${explorerUrl}`, 'info');
+                
+                addLog('[WAIT] Waiting for confirmation (10 seconds)...', 'info');
+                await new Promise(r => setTimeout(r, 10000));
+                
+                addLog('[OK] Approval likely confirmed! Now click "Fund Account" to fund.', 'success');
+                setStatus('Approved! Now click Fund Account', 'success');
+                
+            } catch (error) {
+                const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+                console.error('[APPROVE] Error:', error);
+                addLog(`[ERROR] Approve failed: ${errorMsg}`, 'error');
+                
+                if (errorMsg.includes('rejected') || errorMsg.includes('cancelled')) {
+                    addLog('You rejected the transaction in your wallet', 'info');
+                }
+                
+                setStatus('Approve failed', 'error');
+            }
+        };
+
+        window.fundAccount = async function() {
+            if (!isInitialized || !service) {
+                addLog('Service not initialized. Please connect wallet first.', 'error');
+                setStatus('Connect wallet first', 'error');
+                return;
+            }
+            
+            const amountInput = parseFloat(document.getElementById('fundAmount').value);
+            if (!amountInput || amountInput <= 0) {
+                addLog('Enter a valid amount (e.g., 50 for 50 STRK)', 'error');
+                return;
+            }
+            
+            try {
+                // Determine token name and decimals based on network
+                const tokenName = currentNetwork === 'mainnet' ? 'USDC' : 'STRK';
+                const tokenSymbol = currentNetwork === 'mainnet' ? 'USDC' : 'STRK';
+                const tokenDecimals = currentNetwork === 'mainnet' ? 6 : 18; // USDC has 6 decimals, STRK has 18
+                const networkConfig = getNetworkConfig(currentNetwork);
+                
+                setStatus('Funding...', 'loading');
+                showOperationStatus('fundStatusBanner', 'loading', `Funding ${amountInput.toFixed(2)} ${tokenSymbol}... Please confirm in wallet.`);
+                addLog(`[FUND] Funding ${amountInput.toFixed(2)} ${tokenSymbol}...`, 'info');
+                addLog(`Note: ${currentNetwork === 'mainnet' ? 'Mainnet uses USDC tokens (6 decimals)' : 'Sepolia uses STRK tokens (18 decimals)'}`, 'info');
+                addLog(`[FUND] Token address: ${networkConfig.strkAddress}`, 'info');
+                addLog('Please approve ' + tokenSymbol + ' and confirm fund transaction in your wallet', 'info');
+                
+                // CRITICAL: Convert to token decimals (USDC: 6, STRK: 18)
+                const amountToken = BigInt(Math.floor(amountInput * Math.pow(10, tokenDecimals)));
+                
+                // Pre-check wallet balance for clearer errors
+                try {
+                    const walletBalance = await service.getWalletBalance();
+                    const walletBalanceStr = (Number(walletBalance) / Math.pow(10, tokenDecimals)).toFixed(tokenDecimals === 6 ? 2 : 6);
+                    addLog(`[CHECK] ${tokenSymbol} balance: ${walletBalanceStr} ${tokenSymbol}`, 'info');
+                    if (currentNetwork === 'mainnet' && walletBalance === 0n) {
+                        addLog(`[INFO] Your wallet shows 0 USDC. Make sure you have native USDC (Circle).`, 'warn');
+                        addLog(`Token address: ${networkConfig.strkAddress}`, 'info');
+                    }
+                    if (walletBalance < amountToken) {
+                        addLog(`[ERROR] Insufficient ${tokenSymbol} balance: ${walletBalanceStr} ${tokenSymbol} available.`, 'error');
+                        setStatus(`Insufficient ${tokenSymbol} balance`, 'error');
+                        return;
+                    }
+                } catch (balanceError) {
+                    addLog('[WARN] Could not read wallet balance. Proceeding with funding...', 'warn');
+                }
+                
+                console.log('[FUND] User input:', amountInput, tokenSymbol);
+                console.log('[FUND] Converted to', tokenDecimals + '-decimal:', amountToken.toString());
+                console.log('[FUND] Submitting fund request:', {
+                    inputAmount: amountInput,
+                    amountToken: amountToken.toString(),
+                    tokenDecimals: tokenDecimals,
+                    displayAmount: (Number(amountToken) / Math.pow(10, tokenDecimals)).toFixed(tokenDecimals === 6 ? 2 : 6)
+                });
+                
+                const tx = await service.fundDonationAccount(amountToken);
+                
+                addLog(`[OK] Fund tx submitted! Hash: ${tx.slice(0, 20)}...`, 'success');
+                const explorerUrl = currentNetwork === 'mainnet' 
+                    ? `https://starkscan.co/tx/${tx}` 
+                    : `https://sepolia.starkscan.co/tx/${tx}`;
+                addLog(`View on Starkscan: ${explorerUrl}`, 'info');
+                
+                showOperationStatus('fundStatusBanner', 'success', `Successfully funded ${amountInput.toFixed(2)} ${tokenSymbol}!`, tx);
+                
+                document.getElementById('fundAmount').value = '';
+                
+                // Wait for tx to be indexed
+                addLog('[WAIT] Waiting for transaction confirmation...', 'info');
+                await new Promise(r => setTimeout(r, 4000));
+                
+                // Refresh state
+                addLog('[REFRESH] Refreshing account state...', 'info');
+                await refreshState();
+                
+                setStatus(`[OK] Funded successfully with ${tokenSymbol}!`, 'success');
+                addLog(`[BALANCE] Your Tongo account balance updated`, 'success');
+            } catch (error) {
+                const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+                console.error('[FUND] Error:', error);
+                
+                addLog(`[ERROR] Fund failed: ${errorMsg}`, 'error');
+                
+                // Determine token name for error messages
+                const tokenName = currentNetwork === 'mainnet' ? 'USDC' : 'STRK';
+                
+                // Provide debugging hints
+                if (errorMsg.includes('not deployed')) {
+                    addLog('[HINT] Wallet RPC says contract not deployed. This is a wallet RPC sync issue.', 'warn');
+                    addLog('[FIX] In wallet settings, try changing Sepolia RPC to Alchemy or Infura.', 'warn');
+                    addLog('[FIX] Or switch to mainnet which was working.', 'warn');
+                } else if (errorMsg.includes('NotOwner') || errorMsg.includes('NowOwner')) {
+                    addLog('[HINT] This is an approval error. Try clicking "Approve Token" first, wait for confirmation, then "Fund Account".', 'warn');
+                    addLog('[HINT] Also check: 1) You have ' + (currentNetwork === 'mainnet' ? 'native USDC' : 'STRK') + ', 2) Correct network selected', 'warn');
+                } else if (errorMsg.includes('Insufficient balance')) {
+                    addLog('[HINT] You need more ' + tokenName + '. Send ' + tokenName + ' from exchange to your wallet on ' + currentNetwork + '.', 'warn');
+                } else if (errorMsg.includes('Proof') || errorMsg.includes('proof')) {
+                    addLog('Tongo proof verification failed. Try regenerating your Tongo key.', 'warn');
+                    addLog('Refresh the page and connect wallet again', 'warn');
+                } else if (errorMsg.includes('rejected') || errorMsg.includes('cancelled')) {
+                    addLog('You rejected the transaction in your wallet', 'info');
+                }
+                
+                setStatus('[ERROR] Fund failed', 'error');
+                showOperationStatus('fundStatusBanner', 'error', `Fund failed: ${errorMsg.slice(0, 60)}${errorMsg.length > 60 ? '...' : ''}`);
+            }
+        };
+
+        window.sendDonation = async function() {
+            if (!isInitialized || !service) {
+                addLog('Service not initialized. Please connect wallet first.', 'error');
+                setStatus('Connect wallet first', 'error');
+                return;
+            }
+            
+            const recipient = document.getElementById('recipientKey').value.trim();
+            const amount = parseFloat(document.getElementById('donationAmount').value);
+            
+            if (!recipient) {
+                addLog('Enter recipient Tongo public key (base58 or hex)', 'error');
+                return;
+            }
+
+            const validation = validateRecipientKeyInput(recipient);
+            if (!validation.valid) {
+                addLog(validation.error || 'Invalid recipient public key', 'error');
+                return;
+            }
+            
+            if (!amount || amount <= 0) {
+                addLog('Enter a valid amount', 'error');
+                return;
+            }
+            
+            try {
+                setStatus('Sending transfer...', 'loading');
+                showOperationStatus('transferStatusBanner', 'loading', `Sending ${amount.toFixed(2)} privately... Confirm in wallet.`);
+                
+                // Determine decimals based on current network
+                const tokenDecimals = currentNetwork === 'mainnet' ? 6 : 18; // USDC vs STRK
+                const tokenName = currentNetwork === 'mainnet' ? 'USDC' : 'STRK';
+                
+                // Convert to proper decimals
+                const amountToken = BigInt(Math.floor(amount * Math.pow(10, tokenDecimals)));
+                
+                addLog(`[SEND] Sending ${amount.toFixed(2)} ${tokenName} (amount hidden on-chain)...`, 'info');
+                addLog('[ENCRYPT] This transfer will be ZK-encrypted. Amount is HIDDEN!', 'info');
+                addLog('Please approve the transaction in your wallet', 'info');
+                
+                const tx = await service.sendPrivateDonation(recipient, amountToken);
+                
+                addLog(`[OK] Transfer sent! TX: ${tx.slice(0, 20)}...`, 'success');
+                const explorerUrl = currentNetwork === 'mainnet' 
+                    ? `https://starkscan.co/tx/${tx}` 
+                    : `https://sepolia.starkscan.co/tx/${tx}`;
+                addLog(`View on Starkscan: ${explorerUrl}`, 'info');
+                addLog('[ENCRYPT] Amount is encrypted on-chain', 'info');
+                
+                showOperationStatus('transferStatusBanner', 'success', `Transfer sent! Amount is hidden on-chain.`, tx);
+                
+                document.getElementById('recipientKey').value = '';
+                document.getElementById('donationAmount').value = '';
+                
+                // Wait a bit for transaction to be indexed
+                await new Promise(r => setTimeout(r, 3000));
+                await refreshState();
+                setStatus('[OK] Transfer sent privately!', 'success');
+            } catch (error) {
+                const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+                console.error('[SEND] Error:', error);
+                addLog(`[ERROR] Transfer failed: ${errorMsg}`, 'error');
+                
+                if (errorMsg.includes('Insufficient balance')) {
+                    addLog('[HINT] You don\'t have enough balance in your Tongo account. Fund first!', 'warn');
+                } else if (errorMsg.includes('parse') || errorMsg.includes('public key')) {
+                    addLog('Check recipient public key format (base58 TongoAddress or hex)', 'warn');
+                } else if (errorMsg.includes('user rejected') || errorMsg.includes('cancelled')) {
+                    addLog('Transaction cancelled by user', 'info');
+                }
+                
+                setStatus('[ERROR] Transfer failed', 'error');
+                showOperationStatus('transferStatusBanner', 'error', `Transfer failed: ${errorMsg.slice(0, 50)}${errorMsg.length > 50 ? '...' : ''}`);
+            }
+        };
+
+        window.withdraw = async function() {
+            if (!isInitialized || !service) {
+                addLog('Service not initialized. Please connect wallet first.', 'error');
+                setStatus('Connect wallet first', 'error');
+                return;
+            }
+            
+            const amount = parseFloat(document.getElementById('withdrawAmount').value);
+            if (!amount || amount <= 0) {
+                addLog('Enter a valid amount', 'error');
+                return;
+            }
+            
+            try {
+                setStatus('Withdrawing...', 'loading');
+                
+                // Use correct decimals based on network
+                const tokenDecimals = currentNetwork === 'mainnet' ? 6 : 18; // USDC vs STRK
+                const tokenName = currentNetwork === 'mainnet' ? 'USDC' : 'STRK';
+                
+                const amountToken = BigInt(Math.floor(amount * Math.pow(10, tokenDecimals)));
+                
+                addLog(`[WITHDRAW] Withdrawing ${amount.toFixed(2)} ${tokenName}...`, 'info');
+                addLog('Please approve the transaction in your wallet', 'info');
+                
+                const tx = await service.withdrawDonations(amountToken);
+                
+                addLog(`[OK] Withdrawn! TX: ${tx.slice(0, 20)}...`, 'success');
+                const explorerUrl = currentNetwork === 'mainnet'
+                    ? `https://starkscan.co/tx/${tx}`
+                    : `https://sepolia.starkscan.co/tx/${tx}`;
+                addLog(`View on Starkscan: ${explorerUrl}`, 'info');
+                document.getElementById('withdrawAmount').value = '';
+                
+                // Wait a bit for transaction to be indexed
+                await new Promise(r => setTimeout(r, 3000));
+                await refreshState();
+                setStatus('[OK] Withdrawn successfully!', 'success');
+            } catch (error) {
+                const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+                addLog(`Withdrawal failed: ${errorMsg}`, 'error');
+                setStatus('Withdrawal failed', 'error');
+                
+                // Parse common errors
+                if (errorMsg.includes('insufficient')) {
+                    addLog('Make sure you have enough balance in your Tongo account', 'warn');
+                } else if (errorMsg.includes('user rejected') || errorMsg.includes('cancelled')) {
+                    addLog('Transaction cancelled by user', 'info');
+                }
+            }
+        };
+
+        window.rollover = async function() {
+            if (!isInitialized || !service) {
+                addLog('Service not initialized. Please connect wallet first.', 'error');
+                setStatus('Connect wallet first', 'error');
+                return;
+            }
+            
+            try {
+                setStatus('Rolling over... Waiting for wallet approval...', 'loading');
+                showOperationStatus('rolloverStatusBanner', 'loading', 'Rolling over pending balance... Confirm in wallet.');
+                addLog(`Rolling over pending balance to current balance...`, 'info');
+                addLog('Please approve the transaction in your wallet', 'info');
+                
+                const tx = await service.rolloverBalance();
+                
+                addLog(`Rolled over! TX: ${tx}`, 'success');
+                const explorerUrl = currentNetwork === 'mainnet' 
+                    ? `https://starkscan.co/tx/${tx}` 
+                    : `https://sepolia.starkscan.co/tx/${tx}`;
+                addLog(`View on explorer: ${explorerUrl}`, 'info');
+                
+                showOperationStatus('rolloverStatusBanner', 'success', 'Pending balance moved to current!', tx);
+                
+                // Wait a bit for transaction to be indexed
+                await new Promise(r => setTimeout(r, 3000));
+                await refreshState();
+                setStatus('Rollover complete', 'success');
+            } catch (error) {
+                const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+                addLog(`Rollover failed: ${errorMsg}`, 'error');
+                setStatus('Rollover failed', 'error');
+                showOperationStatus('rolloverStatusBanner', 'error', `Rollover failed: ${errorMsg.slice(0, 50)}${errorMsg.length > 50 ? '...' : ''}`);
+                
+                if (errorMsg.includes('user rejected') || errorMsg.includes('cancelled')) {
+                    addLog('Transaction cancelled by user', 'info');
+                }
+            }
+        };
+
+        window.ragequit = async function() {
+            if (!isInitialized || !service) {
+                addLog('Service not initialized. Please connect wallet first.', 'error');
+                setStatus('Connect wallet first', 'error');
+                return;
+            }
+
+            const tokenName = currentNetwork === 'mainnet' ? 'USDC' : 'STRK';
+            const confirmMsg = `Emergency only.\n\nThis will withdraw your FULL current balance to your wallet and reveal the amount on-chain.\n\nProceed with ragequit?`;
+            if (!confirm(confirmMsg)) {
+                addLog('Ragequit cancelled by user', 'info');
+                return;
+            }
+
+            try {
+                setStatus('Ragequit in progress...', 'loading');
+                addLog(`[RAGEQUIT] Withdrawing full ${tokenName} balance...`, 'warn');
+                addLog('Please approve the transaction in your wallet', 'info');
+
+                const tx = await service.ragequitAll();
+
+                addLog(`[OK] Ragequit submitted! TX: ${tx.slice(0, 20)}...`, 'success');
+                const explorerUrl = currentNetwork === 'mainnet'
+                    ? `https://starkscan.co/tx/${tx}`
+                    : `https://sepolia.starkscan.co/tx/${tx}`;
+                addLog(`View on Starkscan: ${explorerUrl}`, 'info');
+
+                // Wait a bit for transaction to be indexed
+                await new Promise(r => setTimeout(r, 3000));
+                await refreshState();
+                setStatus('[OK] Ragequit complete', 'success');
+            } catch (error) {
+                const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+                addLog(`Ragequit failed: ${errorMsg}`, 'error');
+                setStatus('Ragequit failed', 'error');
+            }
+        };
+
+        window.refreshState = async function() {
+            if (!isInitialized || !service) {
+                const tokenName = currentNetwork === 'mainnet' ? 'USDC' : 'STRK';
+                document.getElementById('publicKey').textContent = 'Not initialized';
+                document.getElementById('walletBalance').textContent = '-';
+                document.getElementById('tongoRate').textContent = '-';
+                    const fundTokenLabel = document.getElementById('fundTokenLabel');
+                    const fundTokenAddress = document.getElementById('fundTokenAddress');
+                    const fundTokenHint = document.getElementById('fundTokenHint');
+                    if (fundTokenLabel) fundTokenLabel.textContent = '-';
+                    if (fundTokenAddress) fundTokenAddress.textContent = '-';
+                    if (fundTokenHint) {
+                        fundTokenHint.textContent = '';
+                        fundTokenHint.style.display = 'none';
+                    }
+                document.getElementById('currentBalanceDisplay').textContent = `0.00 ${tokenName}`;
+                document.getElementById('pendingBalanceDisplay').textContent = `0.00 ${tokenName}`;
+                document.getElementById('rolloverBtn').disabled = true;
+                document.getElementById('rolloverBtn').textContent = 'Rollover (nothing to rollover)';
+                const copyPublicKeyBtn = document.getElementById('copyPublicKeyBtn');
+                const sharePublicKeyBtn = document.getElementById('sharePublicKeyBtn');
+                if (copyPublicKeyBtn) copyPublicKeyBtn.disabled = true;
+                if (sharePublicKeyBtn) sharePublicKeyBtn.disabled = true;
+                const ragequitBtn = document.getElementById('ragequitBtn');
+                if (ragequitBtn) {
+                    ragequitBtn.disabled = true;
+                    ragequitBtn.textContent = 'Ragequit (Withdraw All)';
+                }
+                return;
+            }
+            
+            try {
+                setStatus('Refreshing state...', 'loading');
+                addLog('Refreshing account state...', 'info');
+                await service.refreshState();
+                await updateState(); // Now async to fetch wallet balance and update max sendable
+                addLog('State refreshed', 'success');
+                setStatus('State refreshed', 'success');
+            } catch (error) {
+                const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+                addLog(`Failed to refresh state: ${errorMsg}`, 'error');
+                setStatus('Refresh failed', 'error');
+            }
+        };
+
+        async function updateState() {
+            if (!service) return;
+            const state = service.getState();
+            document.getElementById('publicKey').textContent = state.tongoPublicKey;
+            document.getElementById('starknetAddress').textContent = 
+                `${state.starknetAddress.slice(0, 10)}...${state.starknetAddress.slice(-8)}`;
+            const copyPublicKeyBtn = document.getElementById('copyPublicKeyBtn');
+            const sharePublicKeyBtn = document.getElementById('sharePublicKeyBtn');
+            const hasPublicKey = !!state.tongoPublicKey && !state.tongoPublicKey.startsWith('Error');
+            if (copyPublicKeyBtn) copyPublicKeyBtn.disabled = !hasPublicKey;
+            if (sharePublicKeyBtn) sharePublicKeyBtn.disabled = !hasPublicKey;
+            
+            // Determine token name and decimals based on network
+            const tokenName = currentNetwork === 'mainnet' ? 'USDC' : 'STRK';
+            const tokenDecimals = currentNetwork === 'mainnet' ? 6 : 18; // USDC has 6 decimals, STRK has 18
+            const networkConfig = getNetworkConfig(currentNetwork);
+            const fundTokenLabel = document.getElementById('fundTokenLabel');
+            const fundTokenAddress = document.getElementById('fundTokenAddress');
+            if (fundTokenLabel) {
+                fundTokenLabel.textContent = `${currentNetwork === 'mainnet' ? 'USDC (Native, Circle)' : 'STRK (testnet)'}`;
+            }
+            if (fundTokenAddress) {
+                fundTokenAddress.textContent = networkConfig.strkAddress;
+            }
+            
+            // Convert Tongo units to token amounts for display
+            try {
+                // Use helper methods to convert Tongo units to token amounts
+                const currentDisplay = await service.tongoToDisplayAmount(state.currentBalance);
+                const pendingDisplay = state.pendingBalance > 0n 
+                    ? await service.tongoToDisplayAmount(state.pendingBalance)
+                    : `0.00 ${tokenName}`;
+                
+                // Extract numeric values from display strings for rollover button
+                const currentBalanceStr = currentDisplay.split(' ')[0];
+                const pendingBalanceStr = pendingDisplay.split(' ')[0];
+                
+                // Update new balance display elements
+                document.getElementById('currentBalanceDisplay').textContent = currentDisplay;
+                document.getElementById('pendingBalanceDisplay').textContent = pendingDisplay;
+                
+                // Update rollover button state
+                const rolloverBtn = document.getElementById('rolloverBtn');
+                const pendingBalanceNum = Number(state.pendingBalance);
+                if (pendingBalanceNum > 0) {
+                    rolloverBtn.disabled = false;
+                    rolloverBtn.textContent = `Rollover ${pendingDisplay}`;
+                } else {
+                    rolloverBtn.disabled = true;
+                    rolloverBtn.textContent = 'Rollover (nothing to rollover)';
+                }
+
+                // Update ragequit button state
+                const ragequitBtn = document.getElementById('ragequitBtn');
+                if (ragequitBtn) {
+                    const hasBalance = state.currentBalance > 0n;
+                    ragequitBtn.disabled = !hasBalance;
+                    ragequitBtn.textContent = hasBalance ? 'Ragequit (Withdraw All)' : 'Ragequit (No balance)';
+                }
+            } catch (e) {
+                // Fallback: use raw values if conversion fails
+                console.warn('[UPDATE-STATE] Could not convert Tongo units, using raw values:', e);
+                const currentBalanceStr = (Number(state.currentBalance) / Math.pow(10, tokenDecimals)).toFixed(tokenDecimals === 6 ? 2 : 6);
+                const pendingBalanceStr = (Number(state.pendingBalance) / Math.pow(10, tokenDecimals)).toFixed(tokenDecimals === 6 ? 2 : 6);
+                document.getElementById('currentBalanceDisplay').textContent = `${currentBalanceStr} ${tokenName}`;
+                document.getElementById('pendingBalanceDisplay').textContent = `${pendingBalanceStr} ${tokenName}`;
+                const ragequitBtn = document.getElementById('ragequitBtn');
+                if (ragequitBtn) {
+                    const hasBalance = state.currentBalance > 0n;
+                    ragequitBtn.disabled = !hasBalance;
+                    ragequitBtn.textContent = hasBalance ? 'Ragequit (Withdraw All)' : 'Ragequit (No balance)';
+                }
+            }
+            
+            // Update wallet balance
+            try {
+                const walletBalance = await service.getWalletBalance();
+                const walletBalanceStr = (Number(walletBalance) / Math.pow(10, tokenDecimals)).toFixed(tokenDecimals === 6 ? 2 : 6);
+                const walletBalanceLabel = document.getElementById('walletBalanceLabel');
+                if (walletBalanceLabel) {
+                    walletBalanceLabel.textContent = currentNetwork === 'mainnet' ? 'Wallet USDC Balance:' : 'Wallet STRK Balance:';
+                }
+                document.getElementById('walletBalance').textContent = `${walletBalanceStr} ${currentNetwork === 'mainnet' ? 'USDC' : 'STRK'}`;
+                const fundTokenHint = document.getElementById('fundTokenHint');
+                if (fundTokenHint) {
+                    if (currentNetwork === 'mainnet' && walletBalance === 0n) {
+                        fundTokenHint.innerHTML = `<strong>0 USDC detected!</strong> You need native USDC (Circle) to fund. Acquire USDC via an exchange or bridge from another chain.`;
+                        fundTokenHint.style.display = 'block';
+                    } else {
+                        fundTokenHint.textContent = '';
+                        fundTokenHint.style.display = 'none';
+                    }
+                }
+            } catch (error) {
+                console.error('[UPDATE-STATE] Failed to fetch wallet balance:', error);
+                document.getElementById('walletBalance').textContent = 'Error';
+                const fundTokenHint = document.getElementById('fundTokenHint');
+                if (fundTokenHint) {
+                    fundTokenHint.textContent = 'Unable to read wallet balance. Check RPC or token address.';
+                    fundTokenHint.style.display = 'block';
+                }
+            }
+
+            // Update Tongo rate display
+            try {
+                const rateDisplay = await service.getRateDisplay();
+                document.getElementById('tongoRate').textContent = rateDisplay;
+            } catch (error) {
+                console.warn('[UPDATE-STATE] Failed to fetch rate:', error);
+                document.getElementById('tongoRate').textContent = 'Unavailable';
+            }
+            
+            // Update max sendable amount
+            await updateMaxSendable();
+
+            // Re-validate recipient key if user already typed one
+            const recipientKeyInput = document.getElementById('recipientKey');
+            if (recipientKeyInput && recipientKeyInput.value) {
+                validateRecipientKeyInput(recipientKeyInput.value);
+            }
+        }
+        
+        // Update max sendable display
+        async function updateMaxSendable() {
+            if (!service) return;
+            
+            try {
+                const max = await service.getMaxSendableAmount();
+                const display = document.getElementById('maxSendableAmount');
+                if (display) {
+                    display.textContent = max.display;
+                }
+            } catch (e) {
+                console.warn('[UI] Could not get max sendable:', e);
+                const display = document.getElementById('maxSendableAmount');
+                if (display) {
+                    display.textContent = '--';
+                }
+            }
+        }
+        
+        // Set max amount in input field
+        window.setMaxSendAmount = async function() {
+            if (!service) {
+                addLog('Service not initialized. Please connect wallet first.', 'error');
+                return;
+            }
+            
+            try {
+                const max = await service.getMaxSendableAmount();
+                const tokenDecimals = currentNetwork === 'mainnet' ? 6 : 18;
+                const humanAmount = Number(max.tokenAmount) / Math.pow(10, tokenDecimals);
+                
+                const input = document.getElementById('donationAmount');
+                if (input) {
+                    input.value = humanAmount.toFixed(tokenDecimals <= 6 ? 2 : 6);
+                    addLog(`Set max amount: ${humanAmount.toFixed(tokenDecimals <= 6 ? 2 : 6)} ${currentNetwork === 'mainnet' ? 'USDC' : 'STRK'}`, 'info');
+                }
+            } catch (e) {
+                const errorMsg = e instanceof Error ? e.message : String(e);
+                addLog('Could not set max amount: ' + errorMsg, 'error');
+                console.error('[SET-MAX] Error:', e);
+            }
+        }
+
+        // Live-validate recipient public key format
+        const recipientKeyInput = document.getElementById('recipientKey');
+        if (recipientKeyInput) {
+            recipientKeyInput.addEventListener('input', (e) => {
+                const value = (e.target && e.target.value) ? e.target.value : '';
+                validateRecipientKeyInput(value);
+            });
+            recipientKeyInput.addEventListener('blur', (e) => {
+                const value = (e.target && e.target.value) ? e.target.value : '';
+                validateRecipientKeyInput(value);
+            });
+        }
+
+        // Handle network change
+        const networkSelect = document.getElementById('networkSelect');
+        if (networkSelect) {
+            networkSelect.addEventListener('change', async (e) => {
+                const newNetwork = e.target.value;
+                if (newNetwork !== currentNetwork) {
+                    // Save to localStorage for persistence
+                    localStorage.setItem('tongo-network', newNetwork);
+                    currentNetwork = newNetwork;
+                    
+                    if (isInitialized) {
+                        addLog(`Network changed to ${newNetwork}. Reconnecting...`, 'info');
+                        isInitialized = false;
+                        if (walletAccount) {
+                            await initializeTongoService();
+                        }
+                    }
+                }
+            });
+        }
+
+        // Badge Service Integration
+        function setBadgeStatus(message, type = 'info') {
+            const banner = document.getElementById('badge-status-banner');
+            if (!banner) return;
+            banner.style.display = 'block';
+            banner.textContent = message;
+            const colors = {
+                info: 'rgba(0, 102, 204, 0.3)',
+                success: 'rgba(0, 153, 51, 0.3)',
+                warn: 'rgba(204, 153, 0, 0.3)',
+                error: 'rgba(204, 51, 51, 0.3)'
+            };
+            banner.style.background = colors[type] || colors.info;
+        }
+
+        async function initBadgeService() {
+            if (!walletAccount) return;
+            const section = document.getElementById('badge-section');
+            if (section) section.style.display = 'block';
+            setBadgeStatus('Initializing Sepolia badge verifier...', 'info');
+            
+            try {
+                const sepoliaProvider = createProvider('sepolia');
+                // Pass user-configured proof API URL from localStorage
+                badgeService = new BadgeService(sepoliaProvider, 'sepolia', getProofApiUrl());
+                
+                // Wait for async contract initialization (fetches ABI from chain)
+                await badgeService.ensureInitialized();
+                
+                setBadgeStatus('Connected to Sepolia badge verifier ✅', 'success');
+                await refreshBadgeStatus();
+                
+                // Check proof backend health
+                checkProofBackendHealth();
+            } catch (error) {
+                badgeService = null;
+                console.warn('[BADGE] Could not initialize badge service:', error);
+                setBadgeStatus('Badge verifier unavailable. Please stay on Sepolia or try again later.', 'error');
+            }
+        }
+
+        async function checkProofBackendHealth() {
+            const statusEl = document.getElementById('proof-backend-status');
+            if (!statusEl) return;
+            
+            // Use user-configured URL from localStorage
+            const PROOF_BACKEND_URL = getProofApiUrl();
+            
+            // Show checking state
+            statusEl.className = 'badge-status-inline checking';
+            statusEl.innerHTML = `<span class="status-dot"></span><span><strong>Proof Server:</strong> Checking...</span>`;
+            
+            try {
+                // Simple OPTIONS request to check if server is reachable
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 5000);
+                
+                const response = await fetch(PROOF_BACKEND_URL, {
+                    method: 'OPTIONS',
+                    signal: controller.signal,
+                });
+                clearTimeout(timeoutId);
+                
+                // If we get here without CORS error, server is online
+                statusEl.className = 'badge-status-inline online';
+                statusEl.innerHTML = `
+                    <span class="status-dot"></span>
+                    <span><strong>Proof Server:</strong> Online</span>
+                    <span style="margin-left: auto; font-size: 0.85em; opacity: 0.7;">Ready to generate proofs</span>
+                `;
+                console.log('[BADGE] Proof backend is online');
+            } catch (error) {
+                // Server unreachable
+                statusEl.className = 'badge-status-inline offline';
+                statusEl.innerHTML = `
+                    <span class="status-dot"></span>
+                    <span style="flex: 1;"><strong>Proof Server:</strong> Offline — <a href="https://github.com/codespaces" target="_blank" style="color: inherit; text-decoration: underline;">Start Codespace</a></span>
+                    <button onclick="checkProofBackendHealth()" class="secondary" style="padding: 6px 12px; font-size: 0.8em;">Retry</button>
+                `;
+                console.log('[BADGE] Proof backend is offline');
+            }
+        }
+
+        async function refreshBadgeStatus() {
+            if (!badgeService || !walletAccount) return;
+            
+            try {
+                const tier = await badgeService.getUserBadgeTier(walletAccount.address);
+                const tierName = badgeService.getTierName(tier);
+                
+                const iconEl = document.getElementById('badge-icon');
+                const nameEl = document.getElementById('badge-name');
+                const descEl = document.querySelector('.badge-current-card .badge-description');
+                
+                // Update tier items to show which one is earned
+                document.querySelectorAll('.badge-tier-item').forEach(item => {
+                    const itemTier = parseInt(item.dataset.tier);
+                    if (itemTier <= tier && tier > 0) {
+                        item.classList.add('active');
+                        // Add checkmark if not already there
+                        if (!item.querySelector('.tier-check')) {
+                            item.insertAdjacentHTML('beforeend', '<span class="tier-check">✓</span>');
+                        }
+                    } else {
+                        item.classList.remove('active');
+                        const check = item.querySelector('.tier-check');
+                        if (check) check.remove();
+                    }
+                });
+                
+                if (iconEl && nameEl) {
+                    if (tier === BadgeTier.NONE) {
+                        iconEl.textContent = '⚪';
+                        nameEl.textContent = 'No Badge Yet';
+                        if (descEl) descEl.textContent = 'Complete a transfer and generate a proof to earn your first badge';
+                    } else if (tier === BadgeTier.BRONZE) {
+                        iconEl.textContent = '🥉';
+                        nameEl.textContent = 'Bronze';
+                        if (descEl) descEl.textContent = 'Verified $10+ private transfer';
+                    } else if (tier === BadgeTier.SILVER) {
+                        iconEl.textContent = '🥈';
+                        nameEl.textContent = 'Silver';
+                        if (descEl) descEl.textContent = 'Verified $100+ private transfer';
+                    } else if (tier === BadgeTier.GOLD) {
+                        iconEl.textContent = '🥇';
+                        nameEl.textContent = 'Gold';
+                        if (descEl) descEl.textContent = 'Verified $1000+ private transfer';
+                    }
+                }
+                
+                console.log(`[BADGE] Current badge: ${tierName}`);
+            } catch (e) {
+                console.warn('[BADGE] Could not fetch badge status:', e);
+            }
+        }
+
+        window.generateBadgeProof = async function() {
+            if (!badgeService) {
+                addLog('[BADGE] Badge service not initialized', 'error');
+                return;
+            }
+            
+            const tierSelect = document.getElementById('badge-tier-select');
+            const amountInput = document.getElementById('badge-donation-amount');
+            const secretInput = document.getElementById('badge-secret');
+            const statusDiv = document.getElementById('badge-proof-status');
+            const claimBtn = document.getElementById('claim-badge-btn');
+            
+            if (!tierSelect || !amountInput || !secretInput) {
+                addLog('[BADGE] Form elements not found', 'error');
+                return;
+            }
+            
+            const tier = parseInt(tierSelect.value);
+            const amountDollars = parseFloat(amountInput.value);
+            const secret = secretInput.value;
+            
+            // Validation
+            if (!amountDollars || amountDollars < 10) {
+                addLog('[BADGE] Please enter a valid transfer amount ($10+)', 'error');
+                return;
+            }
+            
+            if (!secret || secret.length < 8) {
+                addLog('[BADGE] Please enter a secret key (at least 8 characters)', 'error');
+                return;
+            }
+            
+            // Convert to cents
+            const amountCents = Math.round(amountDollars * 100);
+            
+            // Check eligibility
+            const threshold = badgeService.getTierThreshold(tier);
+            if (amountCents < threshold) {
+                addLog(`[BADGE] Amount $${amountDollars} is below threshold $${threshold / 100} for selected tier`, 'error');
+                return;
+            }
+            
+            // Show status
+            if (statusDiv) {
+                statusDiv.style.display = 'block';
+                statusDiv.innerHTML = '<div class="status-message">🔄 Generating ZK proof... This may take 30-60 seconds</div>';
+            }
+            
+            try {
+                addLog('[BADGE] Generating ZK proof...', 'info');
+                
+                pendingBadgeProof = await badgeService.generateProof({
+                    donationAmountCents: amountCents,
+                    // Send raw secret; backend computes BN254 Poseidon commitment
+                    donorSecret: secret,
+                    targetTier: tier
+                });
+                
+                if (statusDiv) {
+                    statusDiv.innerHTML = `
+                        <div class="status-message success">
+                            ✅ Proof generated successfully!<br>
+                            <small>Tier: ${badgeService.getTierName(tier)}</small>
+                        </div>
+                    `;
+                }
+                
+                if (claimBtn) {
+                    claimBtn.style.display = 'block';
+                }
+                
+                addLog('[BADGE] ✅ Proof generated! Ready to claim on-chain.', 'success');
+                
+            } catch (error) {
+                const errorMsg = error instanceof Error ? error.message : String(error);
+                
+                // Check for network/CORS errors (proof backend down)
+                const isNetworkError = errorMsg.includes('Failed to fetch') || 
+                                       errorMsg.includes('NetworkError') ||
+                                       errorMsg.includes('ERR_FAILED') ||
+                                       errorMsg.includes('CORS');
+                
+                if (statusDiv) {
+                    if (isNetworkError) {
+                        statusDiv.innerHTML = `
+                            <div class="status-message error">
+                                ❌ Proof backend unavailable<br>
+                                <small>The ZK proof generation server is currently offline.
+                                You can run it locally with <code>bun run api</code>.</small>
+                            </div>`;
+                    } else {
+                        statusDiv.innerHTML = `<div class="status-message error">❌ ${errorMsg}</div>`;
+                    }
+                }
+                
+                if (isNetworkError) {
+                    addLog('[BADGE] Proof backend offline. To run locally: bun run api', 'warn');
+                }
+                addLog(`[BADGE] Error: ${errorMsg}`, 'error');
+            }
+        };
+
+        window.claimBadge = async function() {
+            if (!badgeService || !walletAccount || !pendingBadgeProof) {
+                addLog('[BADGE] No proof to claim', 'error');
+                return;
+            }
+            
+            const statusDiv = document.getElementById('badge-proof-status');
+            const claimBtn = document.getElementById('claim-badge-btn');
+            
+            if (statusDiv) {
+                statusDiv.innerHTML = '<div class="status-message">🔄 Claiming badge on-chain...</div>';
+            }
+            
+            try {
+                addLog('[BADGE] Submitting badge claim to Starknet...', 'info');
+                
+                const txHash = await badgeService.claimBadge(walletAccount, pendingBadgeProof);
+                
+                if (statusDiv) {
+                    statusDiv.innerHTML = `
+                        <div class="status-message success">
+                            ✅ Badge claimed!<br>
+                            <small>TX: ${txHash.slice(0, 20)}...</small>
+                        </div>
+                    `;
+                }
+                
+                if (claimBtn) {
+                    claimBtn.style.display = 'none';
+                }
+                
+                // Refresh badge status
+                await refreshBadgeStatus();
+                
+                // Clear pending proof
+                pendingBadgeProof = null;
+                
+                addLog(`[BADGE] 🏅 Badge claimed! TX: ${txHash}`, 'success');
+                
+            } catch (error) {
+                const errorMsg = error instanceof Error ? error.message : String(error);
+                
+                if (statusDiv) {
+                    statusDiv.innerHTML = `<div class="status-message error">❌ ${errorMsg}</div>`;
+                }
+                
+                addLog(`[BADGE] Claim error: ${errorMsg}`, 'error');
+            }
+        };
+    </script>
+</body>
+</html>
+
