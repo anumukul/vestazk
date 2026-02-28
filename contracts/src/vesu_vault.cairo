@@ -22,14 +22,33 @@ pub trait IERC20<TContractState> {
 }
 
 #[starknet::interface]
+pub trait IVerifier<TContractState> {
+    fn verify_ultra_keccak_honk_proof(
+        self: @TContractState,
+        full_proof_with_hints: Span<felt252>
+    ) -> bool;
+}
+
+#[starknet::interface]
 pub trait IVesuVault<TContractState> {
     fn deposit(ref self: TContractState, amount: u256) -> felt252;
     fn withdraw(ref self: TContractState, commitment: felt252, amount: u256) -> bool;
-    fn borrow(ref self: TContractState, amount: u256, recipient: ContractAddress) -> bool;
+    fn borrow_with_proof(
+        ref self: TContractState,
+        amount: u256,
+        recipient: ContractAddress,
+        full_proof_with_hints: Span<felt252>
+    ) -> bool;
     fn repay(ref self: TContractState, amount: u256) -> bool;
+    fn emergency_exit(
+        ref self: TContractState,
+        commitment: felt252,
+        amount: u256,
+        full_proof_with_hints: Span<felt252>
+    ) -> bool;
     fn get_merkle_root(self: @TContractState) -> felt252;
     fn get_commitment_count(self: @TContractState) -> u64;
-    fn is_commitment_used(self: @TContractState, commitment: felt252) -> bool;
+    fn is_nullifier_used(self: @TContractState, nullifier: felt252) -> bool;
     fn get_total_deposited(self: @TContractState) -> u256;
     fn get_total_borrowed(self: @TContractState) -> u256;
     fn get_aggregate_health_factor(self: @TContractState) -> (u256, u256, u256);
@@ -38,7 +57,8 @@ pub trait IVesuVault<TContractState> {
 #[starknet::contract]
 pub mod VesuVault {
     use super::{
-        ArrayTrait, ContractAddress, IERC20Dispatcher, IERC20DispatcherTrait, IVesuPoolDispatcher,
+        ArrayTrait, ContractAddress, IERC20Dispatcher, IERC20DispatcherTrait, 
+        IVerifierDispatcher, IVerifierDispatcherTrait, IVesuPoolDispatcher,
         IVesuPoolDispatcherTrait, IVesuVault, Span, u256,
     };
     use core::poseidon::poseidon_hash_span;
@@ -49,6 +69,7 @@ pub mod VesuVault {
     };
 
     const MERKLE_TREE_DEPTH: u32 = 20;
+    const EMERGENCY_FEE_PERCENT: u256 = u256 { low: 200, high: 0 };
 
     #[storage]
     struct Storage {
@@ -61,6 +82,7 @@ pub mod VesuVault {
         wbtc_token: ContractAddress,
         usdc_token: ContractAddress,
         vesu_pool: ContractAddress,
+        verifier: ContractAddress,
         min_health_factor: u256,
         buffer_percentage: u256,
     }
@@ -72,6 +94,7 @@ pub mod VesuVault {
         Withdrawn: Withdrawn,
         Borrowed: Borrowed,
         Repaid: Repaid,
+        EmergencyExited: EmergencyExited,
     }
 
     #[derive(Drop, starknet::Event)]
@@ -105,16 +128,27 @@ pub mod VesuVault {
         amount: u256,
     }
 
+    #[derive(Drop, starknet::Event)]
+    pub struct EmergencyExited {
+        #[key]
+        user: ContractAddress,
+        amount: u256,
+        fee: u256,
+        commitment: felt252,
+    }
+
     #[constructor]
     fn constructor(
         ref self: ContractState,
         wbtc_token: ContractAddress,
         usdc_token: ContractAddress,
         vesu_pool: ContractAddress,
+        verifier: ContractAddress,
     ) {
         self.wbtc_token.write(wbtc_token);
         self.usdc_token.write(usdc_token);
         self.vesu_pool.write(vesu_pool);
+        self.verifier.write(verifier);
         self.min_health_factor.write(u256 { low: 110, high: 0 });
         self.buffer_percentage.write(u256 { low: 120, high: 0 });
         self.merkle_root.write(0);
@@ -132,11 +166,11 @@ pub mod VesuVault {
             let vault_address = starknet::get_contract_address();
             
             let transferred = wbtc.transfer_from(caller, vault_address, amount);
-            assert(transferred, 'WBTC transfer failed');
+            assert(transferred == true, 'WBTC transfer failed');
 
             let vesu_pool = IVesuPoolDispatcher { contract_address: self.vesu_pool.read() };
             let supplied = vesu_pool.supply(self.wbtc_token.read(), amount);
-            assert(supplied, 'Vesu supply failed');
+            assert(supplied == true, 'Vesu supply failed');
 
             let salt = self.generate_salt(caller, amount);
             let commitment = self.compute_commitment(caller, amount, salt);
@@ -160,14 +194,14 @@ pub mod VesuVault {
 
         fn withdraw(ref self: ContractState, commitment: felt252, amount: u256) -> bool {
             let caller = get_caller_address();
-            assert(!self.is_commitment_used(commitment), 'Commitment already used');
+            assert(!self.is_nullifier_used(commitment), 'Commitment already used');
 
             let (stored_amount, _) = self.commitments.read(commitment);
             assert(stored_amount == amount, 'Amount mismatch');
 
             let vesu_pool = IVesuPoolDispatcher { contract_address: self.vesu_pool.read() };
             let withdrawn = vesu_pool.withdraw(self.wbtc_token.read(), amount);
-            assert(withdrawn, 'Vesu withdraw failed');
+            assert(withdrawn == true, 'Vesu withdraw failed');
 
             let wbtc = IERC20Dispatcher { contract_address: self.wbtc_token.read() };
             wbtc.transfer(caller, amount);
@@ -184,15 +218,25 @@ pub mod VesuVault {
             true
         }
 
-        fn borrow(ref self: ContractState, amount: u256, recipient: ContractAddress) -> bool {
+        fn borrow_with_proof(
+            ref self: ContractState,
+            amount: u256,
+            recipient: ContractAddress,
+            full_proof_with_hints: Span<felt252>
+        ) -> bool {
             let caller = get_caller_address();
             
+            let verifier_addr = self.verifier.read();
+            let verifier_dispatcher = IVerifierDispatcher { contract_address: verifier_addr };
+            let is_valid = verifier_dispatcher.verify_ultra_keccak_honk_proof(full_proof_with_hints);
+            assert(is_valid == true, 'Invalid ZK proof');
+
             let new_total_borrowed = self.total_borrowed.read() + amount;
             self.total_borrowed.write(new_total_borrowed);
 
             let vesu_pool = IVesuPoolDispatcher { contract_address: self.vesu_pool.read() };
             let borrowed = vesu_pool.borrow(self.usdc_token.read(), amount);
-            assert(borrowed, 'Vesu borrow failed');
+            assert(borrowed == true, 'Vesu borrow failed');
 
             let usdc = IERC20Dispatcher { contract_address: self.usdc_token.read() };
             usdc.transfer(recipient, amount);
@@ -220,13 +264,54 @@ pub mod VesuVault {
 
             let vesu_pool = IVesuPoolDispatcher { contract_address: self.vesu_pool.read() };
             let repaid = vesu_pool.repay(self.usdc_token.read(), amount);
-            assert(repaid, 'Vesu repay failed');
+            assert(repaid == true, 'Vesu repay failed');
 
             self.total_borrowed.write(self.total_borrowed.read() - amount);
 
             self.emit(Event::Repaid(Repaid {
                 user: caller,
                 amount,
+            }));
+
+            true
+        }
+
+        fn emergency_exit(
+            ref self: ContractState,
+            commitment: felt252,
+            amount: u256,
+            full_proof_with_hints: Span<felt252>
+        ) -> bool {
+            let caller = get_caller_address();
+            
+            assert(!self.is_nullifier_used(commitment), 'Commitment already used');
+            
+            let (stored_amount, _) = self.commitments.read(commitment);
+            assert(stored_amount == amount, 'Amount mismatch');
+
+            let verifier_addr = self.verifier.read();
+            let verifier_dispatcher = IVerifierDispatcher { contract_address: verifier_addr };
+            let is_valid = verifier_dispatcher.verify_ultra_keccak_honk_proof(full_proof_with_hints);
+            assert(is_valid == true, 'Invalid ZK proof');
+
+            let fee = (amount * EMERGENCY_FEE_PERCENT) / u256 { low: 10000, high: 0 };
+            let withdraw_amount = amount - fee;
+
+            let vesu_pool = IVesuPoolDispatcher { contract_address: self.vesu_pool.read() };
+            let withdrawn = vesu_pool.withdraw(self.wbtc_token.read(), amount);
+            assert(withdrawn == true, 'Vesu withdraw failed');
+
+            let wbtc = IERC20Dispatcher { contract_address: self.wbtc_token.read() };
+            wbtc.transfer(caller, withdraw_amount);
+
+            self.nullifiers.write(commitment, true);
+            self.total_deposited.write(self.total_deposited.read() - amount);
+
+            self.emit(Event::EmergencyExited(EmergencyExited {
+                user: caller,
+                amount: withdraw_amount,
+                fee,
+                commitment,
             }));
 
             true
@@ -240,8 +325,8 @@ pub mod VesuVault {
             self.commitment_count.read()
         }
 
-        fn is_commitment_used(self: @ContractState, commitment: felt252) -> bool {
-            self.nullifiers.read(commitment)
+        fn is_nullifier_used(self: @ContractState, nullifier: felt252) -> bool {
+            self.nullifiers.read(nullifier)
         }
 
         fn get_total_deposited(self: @ContractState) -> u256 {
