@@ -1,0 +1,14 @@
+[package]
+name = "lending_proof"
+version = "0.1.0"
+type = "bin"
+description = "ZK circuit for proving health factor without revealing position"
+authors = ["VestaZK Team"]
+
+[dependencies]
+poseidon = { git = "https://github.com/noir-lang/poseidon", tag = "v0.1.1" }
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
