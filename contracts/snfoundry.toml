@@ -1,4 +1,4 @@
 [sncast.sepolia]
 url = "https://starknet-sepolia.public.blastapi.io/rpc/v0_7"
 account = "vestazk"
-accounts_file = "~/.starknet_accounts/starknet_open_zeppelin_accounts.json"
+accounts_file = "/Users/anubhavsingh/.starknet_accounts/starknet_open_zeppelin_accounts.json"

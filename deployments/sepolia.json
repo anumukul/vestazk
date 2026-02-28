@@ -19,12 +19,12 @@
       "artifact": "donation_badge_verifier/target/release/donation_badge_verifier_DonationBadge.compiled_contract_class.json"
     },
     "VesuVault": {
-      "class_hash": "",
-      "address": "",
-      "declaration_tx": "",
-      "deployment_tx": "",
+      "class_hash": "0x7d8f42d881f39cf28f4966535851d8c9ce0e4f1803505f1474364a2d120bcd6",
+      "address": "0x04997bb4f992a6c9918030b34947fcc2bc73ce0068e9077a6b07c0abce40baaf",
+      "declaration_tx": "0x432fb4d896d155bebd42f7004a24112ed27fc02c5b65ad9def33f75d38c4116",
+      "deployment_tx": "0x07a208740a1db873afeb81dadd7f95732806d3df7b285880e5d0195b779f25b3",
       "artifact": "contracts/target/release/vesu_vault_VesuVault.compiled_contract_class.json",
-      "note": "To be deployed - WBTC: 0x..., USDC: 0x..., VesuPool: 0x..."
+      "note": "Deployed to Sepolia - needs WBTC, USDC, VesuPool addresses"
     },
     "LendingProofVerifier": {
       "class_hash": "",
