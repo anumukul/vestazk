@@ -2,7 +2,7 @@
 
 ## Overview
 
-VestaZK extends the [Starknet Privacy Toolkit](https://github.com/starknet-edu/starknet-privacy-toolkit) with Vesu lending integration. The toolkit provides the ZK infrastructure; we add lending logic.
+VestaZK is a privacy-preserving lending vault built on Starknet using ZK proofs. It integrates with Vesu lending protocol to enable private borrowing against BTC collateral.
 
 ## System Architecture
 
@@ -189,7 +189,7 @@ IPragmaOracle.get_data_median(data_type: 'BTC/USD') → PragmaPricesResponse
 
 #### Noir Circuit (Our Extension)
 
-Based on toolkit's `donation_badge` circuit (10 lines), extended with health factor:
+Based on the `lending_proof` circuit, extended with health factor verification:
 
 ```rust
 use std::hash::poseidon::bn254::hash_2;
@@ -269,9 +269,9 @@ fn verify_merkle_proof(
 }
 ```
 
-**Circuit Complexity**: ~20K constraints (similar to toolkit's donation_badge)
+**Circuit Complexity**: ~20K constraints
 
-**Proof Generation Time**: 30-60 seconds (same as toolkit)
+**Proof Generation Time**: 30-60 seconds
 
 **Key Extensions from donation_badge**:
 - Added health factor calculation
@@ -613,7 +613,6 @@ self.nullifiers.write(nullifier, true);
 - **ElGamal**: Taher Elgamal, "A public key cryptosystem..."
 
 ### Technical Resources
-- **Toolkit Tutorial**: https://espejel.bearblog.dev/starknet-privacy-toolkit/
 - **Garaga Docs**: https://garaga.gitbook.io/garaga
 - **Noir Book**: https://noir-lang.org/docs
 - **Cairo Book**: https://book.cairo-lang.org
@@ -621,6 +620,4 @@ self.nullifiers.write(nullifier, true);
 
 ---
 
-**"The circuit is 10 lines. The contract is 30 lines. Everything else is plumbing."** - Omar Espejel
-
-This architecture preserves the toolkit's infrastructure while adding lending-specific logic. Fork it, extend it, ship it.
+VestaZK architecture for privacy-preserving lending on Starknet.

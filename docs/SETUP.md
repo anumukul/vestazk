@@ -13,9 +13,7 @@
 
 ### Why Codespaces?
 
-From the [tutorial](https://espejel.bearblog.dev/starknet-privacy-toolkit/):
-
-> "Noir, BB, and Garaga are sensitive to OS versions and system libraries. Codespaces gives a clean Linux environment that matches the toolchain. Fewer local setup surprises means faster onboarding for hackers."
+Note: Noir, Barretenberg, and Garaga are sensitive to OS versions and system libraries. Using Codespaces or a clean Linux environment is recommended for consistent results.
 
 ### Steps
 
@@ -169,7 +167,7 @@ cp .env.example .env.local
 NEXT_PUBLIC_NETWORK=sepolia
 NEXT_PUBLIC_RPC_URL=https://starknet-sepolia.public.blastapi.io/rpc/v0_7
 
-# Tongo (from toolkit)
+# Tongo (optional - for private transfers)
 NEXT_PUBLIC_TONGO_SEPOLIA=0x00f34d7f4558e0634832e5fc3c3fc31f3ec55f8a
 
 # VestaZK contracts (will be added after deployment)
@@ -297,4 +295,4 @@ Once setup is complete:
 - **Setup Issues**: Check [GitHub Issues](https://github.com/anumukul/vestazk/issues)
 - **Noir Docs**: https://noir-lang.org/docs
 - **Garaga Docs**: https://garaga.gitbook.io/garaga
-- **Toolkit Tutorial**: https://espejel.bearblog.dev/starknet-privacy-toolkit/
+- **Vesu Docs**: https://docs.vesu.xyz

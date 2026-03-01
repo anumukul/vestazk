@@ -2,8 +2,6 @@
 
 > Privacy-preserving lending vault on Starknet that prevents liquidation hunting.
 
-Built on [starknet-privacy-toolkit](https://github.com/starknet-edu/starknet-privacy-toolkit) by Omar Espejel.
-
 ## The Problem
 
 Public lending protocols expose every position:
@@ -39,59 +37,53 @@ User Deposits WBTC → VestaZK Vault → Vesu Lending Pool
 3. **Verify**: Contract checks proof, executes borrow
 4. **Privacy**: Observers only see aggregate vault health
 
-## Architecture
-
-### From the Toolkit (Preserved)
-- ✅ Tongo private transfers (Sepolia + Mainnet)
-- ✅ Noir → Barretenberg → Garaga pipeline
-- ✅ Commitment-based privacy system
-- ✅ Poseidon hashing (8× fewer constraints than Pedersen)
-- ✅ Deployed verifiers on Sepolia
-
-### Our Extensions (Building)
-- 🔄 VesuVault contract with deposit/borrow
-- 🔄 Health factor ZK circuit (extends donation_badge)
-- 🔄 Private borrowing interface
-- 🔄 Aggregate health monitoring
-- 🔄 Emergency exit mechanism
-
 ## Tech Stack
 
 | Component | Version | Purpose |
 |-----------|---------|---------|
 | Cairo | 2.6.3+ | Smart contracts |
-| Noir | 1.0.0-beta.1 | ZK circuits (EXACT version) |
-| Barretenberg | 0.67.0 | Proof generation (EXACT version) |
-| Garaga | 0.15.5+ | Proof verification (EXACT version) |
+| Noir | 1.0.0+ | ZK circuits |
+| Barretenberg | 3.0.0+ | Proof generation |
+| Garaga | Latest | Proof verification |
 | Vesu V2 | Latest | Lending protocol |
-| Tongo | Latest | Private transfers |
 | Next.js | 14+ | Frontend |
 | Starknet | Sepolia/Mainnet | Layer 2 |
 
-⚠️ **Version Locking**: Noir/BB/Garaga versions are EXACT. Different versions = different proof formats = verification fails. This is cryptography, not a bug.
+⚠️ **Version Note**: ZK tool versions must be compatible. Different versions may produce incompatible proof formats.
 
 ## Quick Start
 
-### Option A: GitHub Codespaces (Recommended)
-
-**Why Codespaces?** Noir/BB/Garaga are sensitive to OS versions. Codespaces gives clean Linux environment that matches the toolchain.
+### Prerequisites
 
 ```bash
-# 1. Fork this repo on GitHub
-# 2. Create Codespace
-# 3. Run one command (30 minutes)
-chmod +x setup-codespace.sh
-./setup-codespace.sh
+# Install Noir
+curl -L https://raw.githubusercontent.com/noir-lang/noirup/main/install | bash
+nargo --version
 
-# 4. Verify installation
-nargo --version    # 1.0.0-beta.1
-bb --version       # 0.67.0
-source garaga-env/bin/activate && garaga --version  # 0.15.5
+# Install Barretenberg
+npm install -g @aztec/bb
+
+# Install Garaga
+pip install garaga
 ```
 
-### Option B: Local Setup (1 hour)
+### Run the Project
 
-See [docs/SETUP.md](./docs/SETUP.md) for manual installation.
+```bash
+# Install dependencies
+bun install
+
+# Compile contracts
+cd contracts
+scarb build
+
+# Compile ZK circuit
+cd zk-badges/lending_proof
+nargo compile
+
+# Start web UI
+bun run dev:web
+```
 
 ## Project Structure
 
@@ -99,63 +91,51 @@ See [docs/SETUP.md](./docs/SETUP.md) for manual installation.
 vestazk/
 ├── contracts/                    # Cairo smart contracts
 │   └── src/
-│       └── vesu_vault.cairo     # OUR EXTENSION: Main vault
+│       └── vesu_vault.cairo     # Main vault contract
+│       └── ivesu.cairo         # Vesu pool interface
+│       └── ipragma.cairo       # Price oracle interface
 │
 ├── zk-badges/
-│   ├── donation_badge/          # PRESERVED: Template circuit
-│   └── lending_proof/           # OUR EXTENSION: Health factor circuit
+│   └── lending_proof/          # Health factor ZK circuit
 │
-├── src/                         # Frontend
-│   ├── components/
-│   │   └── BorrowInterface.tsx  # OUR EXTENSION
-│   ├── tongo-client.ts          # PRESERVED: Tongo integration
-│   └── badge-service.ts         # PRESERVED: Proof generation
+├── src/                         # Frontend services
+│   ├── vestazk-service.ts      # Vault interactions
+│   ├── proof-generator.ts      # ZK proof generation
+│   └── commitment-storage.ts   # Encrypted storage
+│
+├── app/                         # Next.js frontend
+│   ├── page.tsx                # Landing page
+│   ├── deposit/page.tsx        # Deposit interface
+│   ├── borrow/page.tsx         # Borrow interface
+│   └── dashboard/page.tsx      # Vault dashboard
 │
 ├── deployments/                 # Contract addresses
 │   └── sepolia.json
 │
-├── template/                    # PRESERVED: Minimal examples
-│   ├── snippet.ts
-│   └── quickstart.ts
-│
-├── setup-codespace.sh           # PRESERVED: Toolchain setup
-└── docs/                        # Documentation
+└── docs/                       # Documentation
     ├── SETUP.md
     ├── ARCHITECTURE.md
     └── ROADMAP.md
 ```
 
-## Development Workflow
-
-### Testing Existing Toolkit Features
+## Development Commands
 
 ```bash
-# 1. Health check
+# Health check
 bun run check:health
 
-# 2. Test Tongo
-bun run tongo:init
+# Deploy contracts to Sepolia
+cd contracts
+sncast deploy ...
 
-# 3. Run quickstart
-bun run template:quickstart
+# Generate ZK verifier
+cd zk-badges/lending_proof
+nargo compile
+bb write_vk_ultra_keccak_honk -b ./target/lending_proof.json -o ./target/vk
+garaga gen --system ultra_keccak_honk --vk ./target/vk --output ../../contracts/src/verifier.cairo
 
-# 4. Test donation badge circuit
-cd zk-badges/donation_badge
-nargo test
-```
-
-### Building VestaZK Extensions
-
-```bash
-# Start proof API
-source garaga-env/bin/activate
-bun run api
-
-# Start web UI (separate terminal)
+# Run frontend
 bun run dev:web
-
-# Run tests
-make test
 ```
 
 ## Key Concepts
@@ -175,139 +155,100 @@ Prove you're allowed without showing ID. The proof reveals NOTHING about actual 
 ### 3. Privacy Guarantees
 
 **Protected:**
-- Transfer amounts (encrypted on-chain)
-- Exact donation/borrow amounts (only threshold revealed)
-- Commitment binding (cannot reuse proofs)
+- Collateral amounts (hidden)
+- Debt levels (hidden)
+- Individual health factors (hidden)
+- Liquidation prices (hidden)
 
 **Not Protected:**
-- Wallet addresses (still public)
+- Wallet addresses (public)
 - Transaction timing (visible on-chain)
-- Badge/vault ownership (public)
-
-For stronger privacy: use fresh wallets, don't reuse secrets, add delays.
+- Aggregate vault health (public)
 
 ### 4. The ZK Pipeline
 
 ```
 Noir Circuit → Barretenberg → Garaga → Starknet
    (logic)     (proof gen)   (verifier)  (chain)
-   ~10 lines   ~30-60 sec     ~8KB data
 ```
 
-As OpenZeppelin explains: "Noir abstracts low-level cryptographic complexities, allowing developers to focus on logic rather than circuit optimization."
-
-## Deployed Contracts (From Toolkit)
+## Deployed Contracts
 
 | Network | Contract | Address |
 |---------|----------|---------|
-| **Sepolia** | Donation Badge Verifier | `0x022b20fef3764d09293c5b377bc399ae7490e60665797ec6654d478d74212669` |
-| Sepolia | Donation Badge | `0x077ca6f2ee4624e51ed6ea6d5ca292889ca7437a0c887bf0d63f055f42ad7010` |
-| Sepolia | Tongo Contract | `0x00f34d7f4558e0634832e5fc3c3fc31f3ec55f8a` |
-| **Mainnet** | Tongo Contract (USDC) | `0x00b921c1bdbe9c82f4822c651c633fe2d07d89b5879e3ba57e32f0a16` |
-
-We'll deploy VesuVault to Sepolia for hackathon.
+| Sepolia | VesuVault | (To be deployed) |
+| Sepolia | Lending Verifier | (To be deployed) |
+| Sepolia | WBTC | `0x00452bd5c0512a61df7c7be8cfea5e4f893cb40e126bdc40aee6054db955129e` |
 
 ## Security
 
 ### Audited Components
-- **Garaga**: [CryptoExperts audit](https://github.com/keep-starknet-strange/garaga/blob/main/docs/Garaga-audit-report-v2.pdf) (June 2025)
-- **Barretenberg**: [Veridise audit](https://veridise.com/audits/) (Bigfield primitives)
-- **Poseidon**: [Academic paper](https://eprint.iacr.org/2019/458) (8× fewer constraints than Pedersen)
+- **Garaga**: CryptoExperts audit (June 2025)
+- **Barretenberg**: Veridise audit (Bigfield primitives)
+- **Poseidon**: Academic paper (8× fewer constraints than Pedersen)
 
 ### Trust Assumptions
 - Vesu protocol is secure
 - Pragma price oracle is honest
 - ZK proof system is sound (discrete log hardness)
-- Tongo cryptography is correct (no trusted setup needed)
 
-Audits reduce risk but don't eliminate it. Always review versions.
+⚠️ **WARNING**: This is a hackathon project. NOT AUDITED. Do not use with real funds until fully audited.
 
 ## Roadmap
 
-### Phase 1: Foundation ✅ (Current)
-- [x] Fork starknet-privacy-toolkit
-- [x] Clean commit history
-- [x] Update project documentation
-- [x] Verify toolkit features work
+### Phase 1: Foundation ✅ (COMPLETED)
+- [x] Project setup
+- [x] Documentation
+- [x] Basic vault contract
 
-### Phase 2: Vesu Integration (Week 1)
-- [ ] Create VesuVault contract
-- [ ] Implement deposit with commitments
-- [ ] Integrate with Vesu pool
-- [ ] Write comprehensive tests
-- [ ] Deploy to local devnet
+### Phase 2: Core Features (IN PROGRESS)
+- [x] VesuVault contract with deposit
+- [ ] Borrow with ZK proof verification
+- [ ] Aggregate health tracking
+- [ ] Emergency exit mechanism
 
-### Phase 3: ZK Circuit (Week 1-2)
-- [ ] Extend donation_badge circuit
-- [ ] Add health factor constraints
-- [ ] Test circuit edge cases
+### Phase 3: ZK Circuit
+- [x] Lending proof circuit
 - [ ] Generate Garaga verifier
 - [ ] Deploy verifier to Sepolia
 
-### Phase 4: Contract Integration (Week 2)
-- [ ] Implement borrow with proof verification
-- [ ] Add nullifier system
-- [ ] Implement emergency exit
-- [ ] Full integration tests
-- [ ] Deploy to Sepolia
+### Phase 4: Frontend
+- [ ] Deposit page
+- [ ] Borrow page with proof generation
+- [ ] Dashboard with aggregate stats
 
-### Phase 5: Frontend (Week 2)
-- [ ] Build borrow interface
-- [ ] Client-side proof generation
-- [ ] Connect to Sepolia
+### Phase 5: Deployment
+- [ ] Deploy to Sepolia testnet
 - [ ] End-to-end testing
-- [ ] Deploy to Vercel
-
-### Phase 6: Submission (Week 2)
-- [ ] Documentation complete
-- [ ] Demo video recorded
-- [ ] Blog post published
-- [ ] Final testing
-- [ ] Hackathon submission
 
 ## Resources
 
-### The Toolkit
-- **Tutorial**: https://espejel.bearblog.dev/starknet-privacy-toolkit/
-- **Repo**: https://github.com/starknet-edu/starknet-privacy-toolkit
-- **Live Demo**: https://starknet-privacy-toolkit.vercel.app/
-
 ### ZK Tools
 - **Noir**: https://noir-lang.org/docs
-- **Barretenberg**: https://github.com/AztecProtocol/aztec-packages/tree/master/barretenberg
+- **Barretenberg**: https://github.com/AztecProtocol/aztec-packages
 - **Garaga**: https://garaga.gitbook.io/garaga
 
 ### Starknet
 - **Vesu**: https://docs.vesu.xyz/developers
-- **Tongo**: https://tongo.finance/docs
 - **Cairo Book**: https://book.cairo-lang.org
 - **Starknet Foundry**: https://foundry-rs.github.io/starknet-foundry/
 
 ## Contributing
 
-This is a hackathon project (Feb 1-28, 2026) for Starknet Re{define}.
+This is a hackathon project (Feb 2026) for Starknet Re{Define}.
 
 Development workflow:
 1. Create feature branch
 2. Write code + tests
 3. Test thoroughly
-4. Create PR to develop
+4. Create PR
 5. After review, merge to main
 
 ## License
 
 MIT
 
-## Acknowledgments
+## Contact
 
-Built on [Starknet Privacy Toolkit](https://github.com/starknet-edu/starknet-privacy-toolkit) by [Omar Espejel](https://twitter.com/omarespejel).
-
-Special thanks to:
-- StarkWare for Starknet
-- Vesu team for lending protocol
-- Garaga team for ZK verification
-- Noir team for circuit language
-
----
-
-**"The circuit is 10 lines. The contract is 30 lines. The infrastructure handles the hard parts. Fork it. Plug in your logic. Ship."** - Omar Espejel
+- GitHub: https://github.com/anumukul/vestazk
+- Issues: https://github.com/anumukul/vestazk/issues
