@@ -83,8 +83,10 @@ const VESTA_VAULT_ABI = [
   }
 ];
 
-export const VAULT_ADDRESS = '0x05d2ef72d21c86a78d2b6a311874eb3031dd8137f51e83c8b7d36c817a6aae0b';
-export const WBTC_ADDRESS = '0x00452bd5c0512a61df7c7be8cfea5e4f893cb40e126bdc40aee6054db955129e';
+export const VAULT_ADDRESS = '0x0298cf785099baf7007b49dd80d2b9a87b5144fc7e9ac8eb2483d51867d72076';
+export const WBTC_ADDRESS = '0x07d0fc03b7853f9dad8bb8a5bcac9ad8716c464428298f3770c909a11520061c';
+export const USDC_ADDRESS = '0x017947ec3c751a4aacca5b86aba3d809902455fcc0008e3b1433e69ea60851a4';
+export const VERIFIER_ADDRESS = '0x0636258d58083ae4dd2e83a39316cb8e8d36907aa25e115881ece3ecad197879';
 
 export interface VaultStats {
   merkleRoot: string;
