@@ -1,23 +1,50 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "module": "ESNext",
-    "lib": ["ES2022", "DOM"],
-    "moduleResolution": "node",
-    "rootDir": "./src",
-    "outDir": "./dist",
-    "types": ["node"],
-    "sourceMap": true,
-    "declaration": true,
-    "strict": true,
-    "esModuleInterop": true,
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "allowJs": true,
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "noUnusedLocals": false,
-    "noUnusedParameters": false
+    "jsx": "preserve",
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "paths": {
+      "@/*": [
+        "./*"
+      ]
+    }
   },
-  "include": ["src/**/*", "deployments/**/*.json"],
-  "exclude": ["node_modules", "dist"]
+  "include": [
+    "next-env.d.ts",
+    "app/**/*.ts",
+    "app/**/*.tsx",
+    ".next/types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "src",
+    "template",
+    "scripts",
+    "zk-badges",
+    "donation_badge_verifier",
+    "temp-commitment",
+    "contracts",
+    "vite.config.ts",
+    "*.config.js",
+    "*.config.ts"
+  ]
 }
