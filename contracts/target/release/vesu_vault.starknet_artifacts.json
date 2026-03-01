@@ -1,0 +1,1 @@
+{"version":1,"contracts":[{"id":"v5el01254vt26","package_name":"vesu_vault","contract_name":"VesuVault","module_path":"vesu_vault::vesu_vault::VesuVault","artifacts":{"sierra":"vesu_vault_VesuVault.contract_class.json","casm":"vesu_vault_VesuVault.compiled_contract_class.json"}}]}
