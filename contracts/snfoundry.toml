@@ -1,4 +1,4 @@
 [sncast.sepolia]
-url = "https://starknet-sepolia.public.blastapi.io/rpc/v0_7"
+url = "https://starknet-sepolia.g.alchemy.com/starknet/version/rpc/v0_10/cf52O0RwFy1mEB0uoYsel"
 account = "vestazk"
 accounts_file = "/Users/anubhavsingh/.starknet_accounts/starknet_open_zeppelin_accounts.json"

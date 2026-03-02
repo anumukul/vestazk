@@ -2,33 +2,33 @@
   "network": "sepolia",
   "rpc_url": "https://starknet-sepolia.g.alchemy.com/starknet/version/rpc/v0_10/cf52O0RwFy1mEB0uoYsel",
   "deployer_account": "0x550a0c6f33884299b8ae150c17c4c9409bce3873d61183e47aa652562ad7c5c",
-  "last_updated": "2026-03-02T12:00:00Z",
+  "last_updated": "2026-03-02T14:00:00Z",
   "contracts": {
     "WBTC": {
       "class_hash": "0x67282f05a5a75a740f2c9800289f6ead2d9f27c544a7261ecbbb57d39ef4795",
-      "address": "0x07d0fc03b7853f9dad8bb8a5bcac9ad8716c464428298f3770c909a11520061c",
-      "artifact": "contracts/target/dev/vesu_vault_ERC20.contract_class.json"
+      "address": "0x07d0fc03b7853f9dad8bb8a5bcac9ad8716c464428298f3770c909a11520061c"
     },
     "USDC": {
       "class_hash": "0x67282f05a5a75a740f2c9800289f6ead2d9f27c544a7261ecbbb57d39ef4795",
-      "address": "0x017947ec3c751a4aacca5b86aba3d809902455fcc0008e3b1433e69ea60851a4",
-      "artifact": "contracts/target/dev/vesu_vault_ERC20.contract_class.json"
+      "address": "0x017947ec3c751a4aacca5b86aba3d809902455fcc0008e3b1433e69ea60851a4"
     },
     "Verifier": {
       "class_hash": "0x6da0b2efbb4bd62de5ca27a13fc1cffc102fa5402a2bb2c5d424e6f37b67c0c",
-      "address": "0x0571b55d946a2b750fe87c59871b18d6563199c2862e93133a41754f52f49a99",
-      "artifact": "contracts/target/dev/vesu_vault_Verifier.contract_class.json"
+      "address": "0x0571b55d946a2b750fe87c59871b18d6563199c2862e93133a41754f52f49a99"
+    },
+    "MockVesuPool": {
+      "class_hash": "0x73c5a019bcea2f3098ce4d47e3f0f085e7b2d2e447bee658b23c12186863190",
+      "address": "0x01f828767b76adadcb4ed2f3fb0366faf87bd29a8eaea38f66df6c0abd923f75"
     },
     "VesuVault": {
-      "class_hash": "0x20f1b55e8f956f584c179e46dbf74994a7ec1d4665581dda57f9ef98f617274",
-      "address": "0x07397a0ef35972098047543a40c1acb79edf53a318e6c935b7a95d51027bef05",
-      "artifact": "contracts/target/dev/vesu_vault_VesuVault.contract_class.json"
+      "class_hash": "0x020f1b55e8f956f584c179e46dbf74994a7ec1d4665581dda57f9ef98f617274",
+      "address": "0x024644fe658c37453af830257038271915c657191a151d1a3ff511221e061647"
     }
   },
   "external_contracts": {
     "WBTC": "0x07d0fc03b7853f9dad8bb8a5bcac9ad8716c464428298f3770c909a11520061c",
     "USDC": "0x017947ec3c751a4aacca5b86aba3d809902455fcc0008e3b1433e69ea60851a4",
-    "VesuPool": "0x0000000000000000000000000000000000000000000000000000000000000000",
+    "VesuPool": "0x01f828767b76adadcb4ed2f3fb0366faf87bd29a8eaea38f66df6c0abd923f75",
     "PragmaOracle": "0x36031daa264c24520b11d93af622c848b2499b66b41d611bac95e13cfca131a"
   }
 }
