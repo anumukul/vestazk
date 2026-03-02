@@ -1,8 +1,27 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useContractRead } from '@starknet-react/core';
+import { CONTRACTS } from '../lib/contracts';
 
 export default function DashboardPage() {
+  const VAULT_ADDRESS = CONTRACTS.sepolia.vault;
+
+  // Use Starknet React hook to fetch aggregate health factor
+  const { data: healthData, isError, isLoading: isContractLoading } = useContractRead({
+    functionName: "get_aggregate_health_factor",
+    args: [],
+    address: VAULT_ADDRESS,
+    watch: true, // Auto-refresh if the dashboard stays open
+  });
+
+  const { data: countData } = useContractRead({
+    functionName: "get_commitment_count",
+    args: [],
+    address: VAULT_ADDRESS,
+    watch: true,
+  });
+
   const [stats, setStats] = useState({
     totalCollateral: 0,
     totalDebt: 0,
@@ -12,29 +31,42 @@ export default function DashboardPage() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Simulate fetching vault stats
-    const fetchStats = async () => {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      setStats({
-        totalCollateral: 125.5,
-        totalDebt: 4500000,
-        healthFactor: 1.35,
-        positionCount: 42,
-      });
-      setIsLoading(false);
-    };
+    if (healthData && Array.isArray(healthData)) {
+      // get_aggregate_health_factor returns (u256 collateral_usd, u256 debt_usd, u256 health_factor)
+      // healthFactor is returned as a fixed point number scaled by 1e6
+      // For hackathon mock display, assuming structure matches standard cairo returns
+      try {
+        const collateral = Number(healthData[0]?.low) / 1000000;
+        const debt = Number(healthData[1]?.low) / 1000000;
+        const health = Number(healthData[2]?.low) / 1000000;
 
-    fetchStats();
-  }, []);
+        setStats(prev => ({
+          ...prev,
+          totalCollateral: collateral || 0,
+          totalDebt: debt || 0,
+          healthFactor: health || 0,
+        }));
+      } catch (e) {
+        console.error("Error parsing health data", e);
+      }
+    }
+
+    if (countData !== undefined) {
+      setStats(prev => ({
+        ...prev,
+        positionCount: Number(countData)
+      }));
+    }
+  }, [healthData, countData]);
 
   return (
     <div className="container mx-auto px-4 py-16">
       <h1 className="text-3xl font-bold mb-8 text-center">Vault Dashboard</h1>
 
-      {isLoading ? (
+      {isContractLoading ? (
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-          <p className="text-gray-400 mt-4">Loading vault statistics...</p>
+          <p className="text-gray-400 mt-4">Loading real-time vault statistics from Starknet...</p>
         </div>
       ) : (
         <>
@@ -53,11 +85,10 @@ export default function DashboardPage() {
             </div>
             <div className="bg-gray-800 p-6 rounded-xl border border-gray-700">
               <p className="text-gray-400 text-sm">Aggregate Health</p>
-              <p className={`text-2xl font-bold mt-1 ${
-                stats.healthFactor >= 1.3 ? 'text-green-400' :
-                stats.healthFactor >= 1.1 ? 'text-yellow-400' :
-                'text-red-400'
-              }`}>
+              <p className={`text-2xl font-bold mt-1 ${stats.healthFactor >= 1.3 ? 'text-green-400' :
+                  stats.healthFactor >= 1.1 ? 'text-yellow-400' :
+                    'text-red-400'
+                }`}>
                 {(stats.healthFactor * 100).toFixed(0)}%
               </p>
             </div>
@@ -73,16 +104,15 @@ export default function DashboardPage() {
             <h2 className="text-xl font-semibold mb-4">Vault Status</h2>
             <div className="flex items-center space-x-4">
               <div className="flex-1 bg-gray-700 rounded-full h-4">
-                <div 
+                <div
                   className="bg-gradient-to-r from-green-400 to-green-600 h-4 rounded-full"
                   style={{ width: `${Math.min(stats.healthFactor * 70, 100)}%` }}
                 ></div>
               </div>
-              <span className={`font-semibold ${
-                stats.healthFactor >= 1.3 ? 'text-green-400' :
-                stats.healthFactor >= 1.1 ? 'text-yellow-400' :
-                'text-red-400'
-              }`}>
+              <span className={`font-semibold ${stats.healthFactor >= 1.3 ? 'text-green-400' :
+                  stats.healthFactor >= 1.1 ? 'text-yellow-400' :
+                    'text-red-400'
+                }`}>
                 {stats.healthFactor >= 1.3 ? 'Healthy' : stats.healthFactor >= 1.1 ? 'Moderate' : 'At Risk'}
               </span>
             </div>

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { StarknetProvider } from "./components/StarknetProvider";
 
 export const metadata: Metadata = {
   title: "VestaZK - Privacy-Preserving Lending on Starknet",
@@ -24,10 +25,13 @@ export default function RootLayout({
               <a href="/deposit" className="hover:text-primary transition">Deposit</a>
               <a href="/borrow" className="hover:text-primary transition">Borrow</a>
               <a href="/dashboard" className="hover:text-primary transition">Dashboard</a>
+              <a href="/exit" className="text-red-400 hover:text-red-300 transition">Emergency Exit</a>
             </div>
           </nav>
         </header>
-        <main>{children}</main>
+        <StarknetProvider>
+          <main>{children}</main>
+        </StarknetProvider>
         <footer className="border-t border-gray-700 mt-20">
           <div className="container mx-auto px-4 py-8 text-center text-gray-400">
             <p>Built on Starknet | Privacy-Preserving Lending</p>

@@ -1,12 +1,32 @@
 'use client';
 
 import { useState } from 'react';
+import { useAccount, useContractWrite, useContractRead } from '@starknet-react/core';
+import { CommitmentStorage } from '../lib/CommitmentStorage';
+import { CallData, hash } from 'starknet';
+import { CONTRACTS } from '../lib/contracts';
+const { computePoseidonHashOnElements } = hash;
 
 export default function DepositPage() {
+  const { address, status: walletStatus } = useAccount();
   const [amount, setAmount] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [commitment, setCommitment] = useState('');
+  const [merkleRoot, setMerkleRoot] = useState('');
+
+  const VAULT_ADDRESS = CONTRACTS.sepolia.vault;
+  const WBTC_ADDRESS = CONTRACTS.sepolia.wbtc;
+
+  const { writeAsync } = useContractWrite({
+    calls: []
+  });
+
+  const { data: merkleRootData } = useContractRead({
+    address: VAULT_ADDRESS,
+    functionName: 'get_merkle_root',
+    args: [],
+  });
 
   const handleDeposit = async () => {
     if (!amount || parseFloat(amount) <= 0) {
@@ -14,16 +34,72 @@ export default function DepositPage() {
       return;
     }
 
+    if (!address) {
+      alert('Please connect your Starknet wallet first.');
+      return;
+    }
+
     setIsLoading(true);
     setStatus('idle');
 
     try {
-      // Simulate deposit for demo
+      const amountParsed = Math.floor(parseFloat(amount) * 100000000); // Assuming 8 decimals for WBTC
+
+      // First approve WBTC transfer
+      const approveCalls = [
+        {
+          contractAddress: WBTC_ADDRESS,
+          entrypoint: "approve",
+          calldata: CallData.compile([
+            VAULT_ADDRESS,
+            amountParsed.toString(),
+            "0"
+          ])
+        }
+      ];
+
+      await writeAsync({ calls: approveCalls });
+
+      // Small delay to let approval settle
       await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // Generate mock commitment
-      const mockCommitment = '0x' + Math.random().toString(16).slice(2, 66).padEnd(64, '0');
-      setCommitment(mockCommitment);
+
+      // Execute the deposit smart contract call
+      const depositCalls = [
+        {
+          contractAddress: VAULT_ADDRESS,
+          entrypoint: "deposit",
+          calldata: CallData.compile([amountParsed.toString(), "0"]) // u256 expects low, high
+        }
+      ];
+
+      await writeAsync({ calls: depositCalls });
+
+      // Generate actual commitment parameters
+      const salt = "0x" + Math.random().toString(16).slice(2, 66).padEnd(64, '0');
+
+      // Compute Poseidon(owner, amount, salt)
+      const computedCommitment = computePoseidonHashOnElements([
+        address,
+        amountParsed.toString(),
+        salt
+      ]);
+
+      // Get current merkle root (use default if not available)
+      const currentMerkleRoot = merkleRootData ? merkleRootData.toString() : "0x0";
+
+      // Save locally
+      CommitmentStorage.save(address, {
+        commitment: computedCommitment.toString(),
+        btcAmount: amountParsed.toString(),
+        salt: salt,
+        merkleRoot: currentMerkleRoot,
+        merklePath: Array(20).fill("0x0"),
+        merkleIndices: Array(20).fill(0),
+        timestamp: Date.now()
+      });
+
+      setCommitment(computedCommitment.toString());
+      setMerkleRoot(currentMerkleRoot);
       setStatus('success');
     } catch (error) {
       console.error(error);
@@ -33,11 +109,34 @@ export default function DepositPage() {
     }
   };
 
+  const handleDownloadBackup = () => {
+    if (!address) return;
+    
+    const data = CommitmentStorage.export(address);
+    if (!data) {
+      alert('No commitment data to export');
+      return;
+    }
+    const url = URL.createObjectURL(data);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `vestazk-commitment-${Date.now()}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="container mx-auto px-4 py-16">
       <h1 className="text-3xl font-bold mb-8 text-center">Deposit WBTC</h1>
-      
+
       <div className="max-w-md mx-auto bg-gray-800 p-8 rounded-xl border border-gray-700">
+        <div className="mb-6 flex justify-between items-center bg-gray-900 p-3 rounded-lg border border-gray-700">
+          <span className="text-gray-400 text-sm">Wallet Status</span>
+          <span className={`text-sm font-medium ${walletStatus === 'connected' ? 'text-green-400' : 'text-yellow-400'}`}>
+            {walletStatus === 'connected' ? `Connected: ${address?.slice(0, 6)}...${address?.slice(-4)}` : 'Not Connected'}
+          </span>
+        </div>
+
         <div className="mb-6">
           <label className="block text-gray-300 mb-2">Amount (WBTC)</label>
           <input
@@ -67,6 +166,12 @@ export default function DepositPage() {
             <p className="text-yellow-400 text-sm mt-4">
               ⚠️ Save this commitment! If you lose it, you cannot withdraw your funds.
             </p>
+            <button
+              onClick={handleDownloadBackup}
+              className="mt-4 w-full py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition"
+            >
+              Download Backup
+            </button>
           </div>
         )}
 

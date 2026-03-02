@@ -66,6 +66,9 @@ pub mod VesuVault {
         ArrayTrait, ContractAddress, IERC20Dispatcher, IERC20DispatcherTrait, 
         IVesuVault, u256, BorrowPublicInputs, ExitPublicInputs
     };
+    use crate::ipragma::{IPragmaOracleDispatcher, IPragmaOracleDispatcherTrait};
+    use crate::ivesu::{IVesuPoolDispatcher, IVesuPoolDispatcherTrait};
+    use crate::verifier::{IVerifierDispatcher, IVerifierDispatcherTrait};
     use core::poseidon::poseidon_hash_span;
     use starknet::get_caller_address;
     use starknet::get_contract_address;
@@ -83,6 +86,9 @@ pub mod VesuVault {
         commitments: Map<felt252, (u256, felt252)>,
         user_commitments: Map<ContractAddress, felt252>,
         nullifiers: Map<felt252, bool>,
+        // Merkle tree storage
+        next_index: u64,
+        filled_subtrees: Map<u64, felt252>, // depth (0-19) -> root
         wbtc_token: ContractAddress,
         usdc_token: ContractAddress,
         vesu_pool: ContractAddress,
@@ -169,6 +175,26 @@ pub mod VesuVault {
         self.total_deposited.write(u256 { low: 0, high: 0 });
         self.total_borrowed.write(u256 { low: 0, high: 0 });
         self.paused.write(false);
+        self.next_index.write(0);
+
+        // Precompute zero hashes for filled_subtrees up to depth 20
+        // H(0) is represented directly as 0 here, or precalculated poseidon hashes of zeroes.
+        // For simplicity, we initialize them dynamically on first insert or assume 0 is the zero hash leaf.
+        let mut depth: u64 = 0;
+        let mut current_zero = 0_felt252;
+        loop {
+            if depth == 20 {
+                break;
+            }
+            self.filled_subtrees.write(depth, current_zero);
+            let mut inputs: Array<felt252> = ArrayTrait::new();
+            inputs.append(current_zero);
+            inputs.append(current_zero);
+            current_zero = core::poseidon::poseidon_hash_span(inputs.span());
+            depth += 1;
+        };
+        // The root of empty tree is current_zero
+        self.merkle_root.write(current_zero);
     }
 
     #[abi(embed_v0)]
@@ -184,6 +210,12 @@ pub mod VesuVault {
             
             let transferred = wbtc.transfer_from(caller, vault_address, amount);
             assert(transferred == true, 'WBTC transfer failed');
+
+            // Supply to Vesu pool
+            let vesu = IVesuPoolDispatcher { contract_address: self.vesu_pool.read() };
+            let vesu_pool_address = self.vesu_pool.read();
+            wbtc.approve(vesu_pool_address, amount);
+            vesu.supply(self.wbtc_token.read(), amount);
 
             let salt = self.generate_salt(caller, amount);
             let commitment = self.compute_commitment(caller, amount, salt);
@@ -246,6 +278,20 @@ pub mod VesuVault {
                 'Nullifier already used'
             );
 
+            // Verify ZK proof
+            let verifier = IVerifierDispatcher { contract_address: self.verifier.read() };
+            let is_valid = verifier.verify_proof(
+                proof,
+                public_inputs.merkle_root,
+                public_inputs.borrow_amount.low,
+                public_inputs.borrow_amount.high,
+                public_inputs.btc_price.low,
+                public_inputs.usdc_price.low,
+                public_inputs.min_health_factor.low,
+                public_inputs.nullifier
+            );
+            assert(is_valid, 'Invalid ZK proof');
+
             let (collateral_usd, debt_usd, _) = self.get_aggregate_health_factor();
             
             let new_debt_usd = debt_usd + public_inputs.borrow_amount * public_inputs.usdc_price;
@@ -257,6 +303,10 @@ pub mod VesuVault {
 
             let required_health = self.min_health_factor.read() * self.buffer_percentage.read();
             assert(new_health.low >= required_health.low, 'Insufficient aggregate health');
+
+            // Borrow from Vesu
+            let vesu = IVesuPoolDispatcher { contract_address: self.vesu_pool.read() };
+            vesu.borrow(self.usdc_token.read(), public_inputs.borrow_amount);
 
             let usdc = IERC20Dispatcher { contract_address: self.usdc_token.read() };
             usdc.transfer(recipient, public_inputs.borrow_amount);
@@ -285,9 +335,27 @@ pub mod VesuVault {
                 'Nullifier already used'
             );
 
+            // Verify ZK proof for emergency exit
+            let verifier = IVerifierDispatcher { contract_address: self.verifier.read() };
+            let is_valid = verifier.verify_exit_proof(
+                proof,
+                public_inputs.commitment,
+                public_inputs.btc_amount.low,
+                public_inputs.btc_amount.high,
+                public_inputs.merkle_root,
+                public_inputs.health_factor.low,
+                public_inputs.health_factor.high,
+                public_inputs.nullifier
+            );
+            assert(is_valid, 'Invalid exit ZK proof');
+
             let user_collateral = public_inputs.btc_amount;
             let exit_fee = (user_collateral * u256 { low: 2, high: 0 }) / u256 { low: 100, high: 0 };
             let withdraw_amount = user_collateral - exit_fee;
+
+            // Withdraw from Vesu
+            let vesu = IVesuPoolDispatcher { contract_address: self.vesu_pool.read() };
+            vesu.withdraw(self.wbtc_token.read(), user_collateral); // Withdraw full collateral amount
 
             let wbtc = IERC20Dispatcher { contract_address: self.wbtc_token.read() };
             let caller = get_caller_address();
@@ -366,11 +434,16 @@ pub mod VesuVault {
         }
 
         fn get_btc_price(self: @ContractState) -> u256 {
-            u256 { low: 65000000000, high: 0 }
+            let oracle = IPragmaOracleDispatcher { contract_address: self.pragma_oracle.read() };
+            // BTC/USD pair id is short string 'BTC/USD'
+            let response = oracle.get_data_median('BTC/USD');
+            u256 { low: response.price.into(), high: 0 }
         }
 
         fn get_usdc_price(self: @ContractState) -> u256 {
-            u256 { low: 1000000, high: 0 }
+            let oracle = IPragmaOracleDispatcher { contract_address: self.pragma_oracle.read() };
+            let response = oracle.get_data_median('USDC/USD');
+            u256 { low: response.price.into(), high: 0 }
         }
 
         fn pause(ref self: ContractState) -> bool {
@@ -431,18 +504,58 @@ pub mod VesuVault {
         }
 
         fn update_merkle_root(
-            self: @ContractState,
+            ref self: ContractState,
             commitment: felt252,
             index: u64,
         ) -> felt252 {
-            let current_root = self.merkle_root.read();
-            if current_root == 0 {
-                return commitment;
-            }
-            let mut inputs: Array<felt252> = ArrayTrait::new();
-            inputs.append(current_root);
-            inputs.append(commitment);
-            poseidon_hash_span(inputs.span())
+            let mut current_index = index;
+            let mut current_level_hash = commitment;
+            let mut left: felt252 = 0;
+            let mut right: felt252 = 0;
+
+            let mut depth: u64 = 0;
+            // Iterate through 20 levels
+            loop {
+                if depth == 20 {
+                    break;
+                }
+                if current_index % 2 == 0 {
+                    left = current_level_hash;
+                    // Right component is the deterministic zero hash for this depth
+                    right = self.get_zero_hash(depth);
+                    self.filled_subtrees.write(depth, current_level_hash);
+                } else {
+                    left = self.filled_subtrees.read(depth);
+                    right = current_level_hash;
+                }
+
+                let mut hash_inputs: Array<felt252> = ArrayTrait::new();
+                hash_inputs.append(left);
+                hash_inputs.append(right);
+                current_level_hash = poseidon_hash_span(hash_inputs.span());
+
+                current_index /= 2;
+                depth += 1;
+            };
+
+            current_level_hash
+        }
+
+        // Helper to recalculate zero hashes if needed or retrieve them.
+        fn get_zero_hash(self: @ContractState, depth: u64) -> felt252 {
+            let mut current_zero = 0_felt252;
+            let mut d: u64 = 0;
+            loop {
+                if d == depth {
+                    break;
+                }
+                let mut inputs: Array<felt252> = ArrayTrait::new();
+                inputs.append(current_zero);
+                inputs.append(current_zero);
+                current_zero = poseidon_hash_span(inputs.span());
+                d += 1;
+            };
+            current_zero
         }
     }
 }

@@ -1,8 +1,8 @@
 {
   "network": "sepolia",
   "rpc_url": "https://starknet-sepolia.g.alchemy.com/starknet/version/rpc/v0_10/cf52O0RwFy1mEB0uoYsel",
-  "deployer_account": "0x03d9c2de3468a0710ef3f8a1c7f3f7248b7eb0c826e1c9a50386db18e8d5ee9f",
-  "last_updated": "2026-03-01T12:00:00Z",
+  "deployer_account": "0x550a0c6f33884299b8ae150c17c4c9409bce3873d61183e47aa652562ad7c5c",
+  "last_updated": "2026-03-02T12:00:00Z",
   "contracts": {
     "WBTC": {
       "class_hash": "0x67282f05a5a75a740f2c9800289f6ead2d9f27c544a7261ecbbb57d39ef4795",
@@ -15,20 +15,20 @@
       "artifact": "contracts/target/dev/vesu_vault_ERC20.contract_class.json"
     },
     "Verifier": {
-      "class_hash": "0x7a09edb8c88de3dbdc53a241958888cc9d18f88d92fbca3219b3906ccab30cc",
-      "address": "0x0636258d58083ae4dd2e83a39316cb8e8d36907aa25e115881ece3ecad197879",
+      "class_hash": "0x6da0b2efbb4bd62de5ca27a13fc1cffc102fa5402a2bb2c5d424e6f37b67c0c",
+      "address": "0x0571b55d946a2b750fe87c59871b18d6563199c2862e93133a41754f52f49a99",
       "artifact": "contracts/target/dev/vesu_vault_Verifier.contract_class.json"
     },
     "VesuVault": {
-      "class_hash": "0x4ae12f81c14c72708a3f621f2d7c262d18e91e03dbf612f0064c2b8a195e9d0",
-      "address": "0x0298cf785099baf7007b49dd80d2b9a87b5144fc7e9ac8eb2483d51867d72076",
+      "class_hash": "0x20f1b55e8f956f584c179e46dbf74994a7ec1d4665581dda57f9ef98f617274",
+      "address": "0x07397a0ef35972098047543a40c1acb79edf53a318e6c935b7a95d51027bef05",
       "artifact": "contracts/target/dev/vesu_vault_VesuVault.contract_class.json"
     }
   },
   "external_contracts": {
     "WBTC": "0x07d0fc03b7853f9dad8bb8a5bcac9ad8716c464428298f3770c909a11520061c",
     "USDC": "0x017947ec3c751a4aacca5b86aba3d809902455fcc0008e3b1433e69ea60851a4",
-    "VesuPool": "0x0000000000000000000000000000000000000000",
-    "PragmaOracle": "0x2a85bd616f912537c50a49a4076db02c00b29b2cdc8a197ce92ed1837fa875b"
+    "VesuPool": "0x0000000000000000000000000000000000000000000000000000000000000000",
+    "PragmaOracle": "0x36031daa264c24520b11d93af622c848b2499b66b41d611bac95e13cfca131a"
   }
 }
