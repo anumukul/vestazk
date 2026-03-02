@@ -24,10 +24,11 @@ export default function BorrowPage() {
 
   const VAULT_ADDRESS = CONTRACTS.sepolia.vault;
 
-  const { data: merkleRootData } = useContractRead({
+  const { data: merkleRootData, refetch } = useContractRead({
     address: VAULT_ADDRESS,
     functionName: 'get_merkle_root',
     args: [],
+    watch: true,
   });
 
   useEffect(() => {
@@ -79,6 +80,12 @@ export default function BorrowPage() {
       return;
     }
 
+    // Wait for merkle root to be loaded
+    if (!merkleRootData) {
+      alert('Loading vault data... Please try again in a few seconds.');
+      return;
+    }
+
     setIsGeneratingProof(true);
     setStatus('idle');
 
@@ -92,7 +99,11 @@ export default function BorrowPage() {
         throw new Error("No commitment data found. Please deposit first.");
       }
 
-      const currentMerkleRoot = merkleRootData ? merkleRootData.toString() : data.merkleRoot;
+      // Use the CURRENT merkle root from contract
+      const currentMerkleRoot = merkleRootData.toString();
+      console.log("Current merkle root:", currentMerkleRoot);
+      console.log("Stored merkle root:", data.merkleRoot);
+      
       const borrowAmountParsed = Math.floor(parseFloat(borrowAmount) * 1000000); // USDC 6 decimals
       
       // Generate nullifier
