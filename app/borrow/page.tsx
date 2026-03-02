@@ -42,6 +42,30 @@ export default function BorrowPage() {
         console.log("Merkle root fetched:", result.toString());
       } catch (e) {
         console.error("Failed to fetch merkle root:", e);
+        // Try alternate method
+        try {
+          const response = await fetch(RPC_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              jsonrpc: '2.0',
+              method: 'starknet_call',
+              params: [{
+                entry_point_selector: 'get_merkle_root',
+                contract_address: VAULT_ADDRESS
+              }, 'latest'],
+              id: 1
+            })
+          });
+          const data = await response.json();
+          if (data.result) {
+            const root = data.result[0];
+            setMerkleRoot(root);
+            console.log("Merkle root fetched (raw):", root);
+          }
+        } catch (e2) {
+          console.error("Alternate method also failed:", e2);
+        }
       }
     }
     fetchMerkleRoot();
