@@ -1,11 +1,17 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useAccount, useContractWrite, useContractRead } from '@starknet-react/core';
-import { CallData, hash } from 'starknet';
+import { useAccount, useContractWrite } from '@starknet-react/core';
+import { CallData, hash, Provider, Contract } from 'starknet';
 import { CommitmentStorage } from '../lib/CommitmentStorage';
 import { CONTRACTS, MIN_HEALTH_FACTOR } from '../lib/contracts';
 const { computePoseidonHashOnElements } = hash;
+
+const RPC_URL = "https://starknet-sepolia.g.alchemy.com/starknet/version/rpc/v0_10/cf52O0RwFy1mEB0uoYsel";
+
+const MERKLE_ROOT_ABI = [
+  "func get_merkle_root() -> (merkle_root: felt252)"
+];
 
 export default function BorrowPage() {
   const { address, status: walletStatus } = useAccount();
@@ -17,6 +23,7 @@ export default function BorrowPage() {
   const [healthFactor, setHealthFactor] = useState<number | null>(null);
   const [commitmentData, setCommitmentData] = useState<any>(null);
   const [generatedProof, setGeneratedProof] = useState<any>(null);
+  const [merkleRoot, setMerkleRoot] = useState<string>('');
 
   const btcPrice = 65000;
   const usdcPrice = 1;
@@ -24,12 +31,21 @@ export default function BorrowPage() {
 
   const VAULT_ADDRESS = CONTRACTS.sepolia.vault;
 
-  const { data: merkleRootData, refetch } = useContractRead({
-    address: VAULT_ADDRESS,
-    functionName: 'get_merkle_root',
-    args: [],
-    watch: true,
-  });
+  // Fetch merkle root using starknet.js directly
+  useEffect(() => {
+    async function fetchMerkleRoot() {
+      try {
+        const provider = new Provider({ nodeUrl: RPC_URL });
+        const contract = new Contract(MERKLE_ROOT_ABI, VAULT_ADDRESS, provider);
+        const result = await contract.get_merkle_root();
+        setMerkleRoot(result.toString());
+        console.log("Merkle root fetched:", result.toString());
+      } catch (e) {
+        console.error("Failed to fetch merkle root:", e);
+      }
+    }
+    fetchMerkleRoot();
+  }, [VAULT_ADDRESS]);
 
   useEffect(() => {
     if (borrowAmount && btcCollateral) {
@@ -81,8 +97,8 @@ export default function BorrowPage() {
     }
 
     // Wait for merkle root to be loaded
-    if (!merkleRootData) {
-      alert('Loading vault data... Please try again in a few seconds.');
+    if (!merkleRoot) {
+      alert('Loading vault data... Please wait a moment and try again.');
       return;
     }
 
@@ -100,7 +116,7 @@ export default function BorrowPage() {
       }
 
       // Use the CURRENT merkle root from contract
-      const currentMerkleRoot = merkleRootData.toString();
+      const currentMerkleRoot = merkleRoot;
       console.log("Current merkle root:", currentMerkleRoot);
       console.log("Stored merkle root:", data.merkleRoot);
       
