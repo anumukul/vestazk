@@ -2,16 +2,12 @@
 
 import { useState, useEffect } from 'react';
 import { useAccount, useContractWrite } from '@starknet-react/core';
-import { CallData, hash, Provider, Contract } from 'starknet';
+import { CallData, hash } from 'starknet';
 import { CommitmentStorage } from '../lib/CommitmentStorage';
 import { CONTRACTS, MIN_HEALTH_FACTOR } from '../lib/contracts';
 const { computePoseidonHashOnElements } = hash;
 
 const RPC_URL = "https://starknet-sepolia.g.alchemy.com/starknet/version/rpc/v0_10/cf52O0RwFy1mEB0uoYsel";
-
-const MERKLE_ROOT_ABI = [
-  "func get_merkle_root() -> (merkle_root: felt252)"
-];
 
 export default function BorrowPage() {
   const { address, status: walletStatus } = useAccount();
@@ -31,41 +27,34 @@ export default function BorrowPage() {
 
   const VAULT_ADDRESS = CONTRACTS.sepolia.vault;
 
-  // Fetch merkle root using starknet.js directly
+  // Fetch merkle root using direct RPC call
   useEffect(() => {
     async function fetchMerkleRoot() {
       try {
-        const provider = new Provider({ nodeUrl: RPC_URL });
-        const contract = new Contract(MERKLE_ROOT_ABI, VAULT_ADDRESS, provider);
-        const result = await contract.get_merkle_root();
-        setMerkleRoot(result.toString());
-        console.log("Merkle root fetched:", result.toString());
+        const response = await fetch(RPC_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            jsonrpc: '2.0',
+            id: 1,
+            method: 'starknet_call',
+            params: [{
+              entry_point_selector: '0x3e32738e9f3e648e22b46d4d057c7d3562e7c70dc9a9e1f4f4c1c9c4e8c8d3',
+              contract_address: VAULT_ADDRESS
+            }, 'latest']
+          })
+        });
+        const data = await response.json();
+        console.log("RPC Response:", data);
+        if (data.result) {
+          const root = data.result[0];
+          setMerkleRoot(root);
+          console.log("Merkle root fetched:", root);
+        } else if (data.error) {
+          console.error("RPC Error:", data.error);
+        }
       } catch (e) {
         console.error("Failed to fetch merkle root:", e);
-        // Try alternate method
-        try {
-          const response = await fetch(RPC_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              jsonrpc: '2.0',
-              method: 'starknet_call',
-              params: [{
-                entry_point_selector: 'get_merkle_root',
-                contract_address: VAULT_ADDRESS
-              }, 'latest'],
-              id: 1
-            })
-          });
-          const data = await response.json();
-          if (data.result) {
-            const root = data.result[0];
-            setMerkleRoot(root);
-            console.log("Merkle root fetched (raw):", root);
-          }
-        } catch (e2) {
-          console.error("Alternate method also failed:", e2);
-        }
       }
     }
     fetchMerkleRoot();
