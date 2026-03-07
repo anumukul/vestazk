@@ -31,6 +31,7 @@ export default function BorrowPage() {
   useEffect(() => {
     async function fetchMerkleRoot() {
       try {
+        // get_merkle_root selector - using starknet_getFunctionSelector
         const response = await fetch(RPC_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -40,12 +41,13 @@ export default function BorrowPage() {
             method: 'starknet_call',
             params: [{
               entry_point_selector: '0x3e32738e9f3e648e22b46d4d057c7d3562e7c70dc9a9e1f4f4c1c9c4e8c8d3',
-              contract_address: VAULT_ADDRESS
+              contract_address: VAULT_ADDRESS,
+              calldata: []
             }, 'latest']
           })
         });
         const data = await response.json();
-        console.log("RPC Response:", data);
+        console.log("Merkle root RPC Response:", data);
         if (data.result) {
           const root = data.result[0];
           setMerkleRoot(root);
