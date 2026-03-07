@@ -1,12 +1,30 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useAccount, useContractRead, useProvider } from '@starknet-react/core';
+import { Contract } from 'starknet';
 import { CONTRACTS } from '../lib/contracts';
-
-const RPC_URL = "https://starknet-sepolia.g.alchemy.com/starknet/version/rpc/v0_10/cf52O0RwFy1mEB0uoYsel";
 
 export default function DashboardPage() {
   const VAULT_ADDRESS = CONTRACTS.sepolia.vault;
+  const { account } = useAccount();
+  
+  // Use starknet-react hooks
+  const { data: countData, error: countError, isLoading: countLoading, refetch: refetchCount } = useContractRead({
+    address: VAULT_ADDRESS,
+    functionName: 'get_commitment_count',
+    args: [],
+    watch: true,
+    blockIdentifier: 'latest',
+  });
+
+  const { data: rootData, error: rootError, isLoading: rootLoading, refetch: refetchRoot } = useContractRead({
+    address: VAULT_ADDRESS,
+    functionName: 'get_merkle_root',
+    args: [],
+    watch: true,
+    blockIdentifier: 'latest',
+  });
 
   const [stats, setStats] = useState({
     totalCollateral: 0,
@@ -18,75 +36,56 @@ export default function DashboardPage() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    async function fetchData() {
+    console.log("Count data:", countData, "Error:", countError, "Loading:", countLoading);
+    console.log("Root data:", rootData, "Error:", rootError, "Loading:", rootLoading);
+    
+    let count = 0;
+    let root = '';
+    
+    if (countData) {
       try {
-        // Fetch commitment count - use function name directly
-        const countResponse = await fetch(RPC_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            jsonrpc: '2.0',
-            id: 1,
-            method: 'starknet_call',
-            params: [{
-              contract_address: VAULT_ADDRESS,
-              entry_point_selector: "get_commitment_count",
-              calldata: []
-            }, 'latest']
-          })
-        });
-        const countData = await countResponse.json();
-        console.log("Count response:", countData);
-        
-        let count = 0;
-        if (countData.result && countData.result[0]) {
-          count = parseInt(countData.result[0], 10);
+        if (typeof countData === 'bigint') {
+          count = Number(countData);
+        } else if (Array.isArray(countData)) {
+          count = Number(countData[0] || 0);
         }
-
-        // Fetch merkle root - use function name directly
-        const rootResponse = await fetch(RPC_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            jsonrpc: '2.0',
-            id: 1,
-            method: 'starknet_call',
-            params: [{
-              contract_address: VAULT_ADDRESS,
-              entry_point_selector: "get_merkle_root",
-              calldata: []
-            }, 'latest']
-          })
-        });
-        const rootData = await rootResponse.json();
-        console.log("Merkle root response:", rootData);
-        
-        let root = '';
-        if (rootData.result && rootData.result[0]) {
-          root = rootData.result[0];
-        }
-
-        // Mock data for demo since oracle may not work
-        setStats({
-          totalCollateral: count > 0 ? 6500 : 0,
-          totalDebt: 0,
-          healthFactor: 10000,
-          positionCount: count,
-          merkleRoot: root
-        });
-
-        setIsLoading(false);
       } catch (e) {
-        console.error("Failed to fetch data:", e);
-        setIsLoading(false);
+        console.error("Error parsing count:", e);
       }
     }
-    fetchData();
-  }, [VAULT_ADDRESS]);
+    
+    if (rootData) {
+      try {
+        root = String(rootData);
+      } catch (e) {
+        console.error("Error parsing root:", e);
+      }
+    }
+
+    // For demo, show mock data if no real data
+    setStats({
+      totalCollateral: count > 0 ? 6500 : 0,
+      totalDebt: 0,
+      healthFactor: 10000,
+      positionCount: count,
+      merkleRoot: root
+    });
+    
+    setIsLoading(false);
+  }, [countData, rootData, countError, rootError]);
 
   return (
     <div className="container mx-auto px-4 py-16">
       <h1 className="text-3xl font-bold mb-8 text-center">Vault Dashboard</h1>
+
+      <div className="text-center mb-4">
+        <button 
+          onClick={() => { refetchCount(); refetchRoot(); }}
+          className="px-4 py-2 bg-blue-600 rounded-lg"
+        >
+          Refresh Data
+        </button>
+      </div>
 
       {isLoading ? (
         <div className="text-center">
@@ -162,7 +161,7 @@ export default function DashboardPage() {
               <div className="flex items-start space-x-3">
                 <span className="text-green-400">✓</span>
                 <div>
-                  <p className="text-white font-medium">Liquidation prices are private</p>
+                  <p className="text-white font-medium"> Liquidation prices are private</p>
                   <p className="text-gray-400 text-sm">MEV bots cannot calculate your liquidation price</p>
                 </div>
               </div>

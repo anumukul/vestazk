@@ -4,30 +4,33 @@ import { ReactNode } from "react";
 import { mainnet, sepolia } from "@starknet-react/chains";
 import {
   StarknetConfig,
-  publicProvider,
   argent,
   braavos,
   useInjectedConnectors,
-  voyager
+  voyager,
+  jsonRpcProvider
 } from "@starknet-react/core";
+
+const RPC_URL = 'https://starknet-sepolia.g.alchemy.com/starknet/version/rpc/v0_10/cf52O0RwFy1mEB0uoYsel';
 
 export function StarknetProvider({ children }: { children: ReactNode }) {
   const { connectors } = useInjectedConnectors({
-    // Show these wallets by default
     recommended: [
       argent(),
       braavos(),
     ],
-    // Hide recommended wallets if they're not installed
     includeRecommended: "onlyIfNoConnectors",
-    // Auto-connect to previously connected wallet
     order: "random"
   });
 
   return (
     <StarknetConfig
       chains={[sepolia, mainnet]}
-      provider={publicProvider()}
+      provider={jsonRpcProvider({
+        rpc: (chain) => ({
+          nodeUrl: RPC_URL,
+        }),
+      })}
       connectors={connectors}
       explorer={voyager}
     >
