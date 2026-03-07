@@ -8,11 +8,6 @@ const RPC_URL = "https://starknet-sepolia.g.alchemy.com/starknet/version/rpc/v0_
 export default function DashboardPage() {
   const VAULT_ADDRESS = CONTRACTS.sepolia.vault;
 
-  const SELECTORS = {
-    get_commitment_count: '0x347e945ab47091e31323f58244ac1987a728ecc433a5461b1eba2613b149643',
-    get_merkle_root: '0x3e32738e9f3e648e22b46d4d057c7d3562e7c70dc9a9e1f4f4c1c9c4e8c8d3'
-  };
-
   const [stats, setStats] = useState({
     totalCollateral: 0,
     totalDebt: 0,
@@ -25,7 +20,7 @@ export default function DashboardPage() {
   useEffect(() => {
     async function fetchData() {
       try {
-        // Fetch commitment count
+        // Fetch commitment count - use function name directly
         const countResponse = await fetch(RPC_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -34,8 +29,8 @@ export default function DashboardPage() {
             id: 1,
             method: 'starknet_call',
             params: [{
-              entry_point_selector: SELECTORS.get_commitment_count,
               contract_address: VAULT_ADDRESS,
+              entry_point_selector: "get_commitment_count",
               calldata: []
             }, 'latest']
           })
@@ -45,10 +40,10 @@ export default function DashboardPage() {
         
         let count = 0;
         if (countData.result && countData.result[0]) {
-          count = parseInt(countData.result[0], 16);
+          count = parseInt(countData.result[0], 10);
         }
 
-        // Fetch merkle root
+        // Fetch merkle root - use function name directly
         const rootResponse = await fetch(RPC_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -57,8 +52,8 @@ export default function DashboardPage() {
             id: 1,
             method: 'starknet_call',
             params: [{
-              entry_point_selector: SELECTORS.get_merkle_root,
               contract_address: VAULT_ADDRESS,
+              entry_point_selector: "get_merkle_root",
               calldata: []
             }, 'latest']
           })
