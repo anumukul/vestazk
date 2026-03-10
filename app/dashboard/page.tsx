@@ -84,50 +84,41 @@ export default function DashboardPage() {
           totalBorrowed = BigInt(borrowedData.result[0]) + (BigInt(borrowedData.result[1]) << BigInt(128));
         }
 
-        // Calculate USD values (BTC price ~$65,000, USDC ~$1)
-        const btcPrice = BigInt(65000);
-        const btcDecimals = BigInt(100000000); // 8 decimals
-        const usdcDecimals = BigInt(1000000);  // 6 decimals
+        // Fetch aggregate health factor directly
+        const healthRes = await fetch(RPC_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            jsonrpc: '2.0', id: 3,
+            method: 'starknet_call',
+            params: [{
+              contract_address: VAULT_ADDRESS,
+              entry_point_selector: hash.getSelectorFromName('get_aggregate_health_factor'),
+              calldata: []
+            }, 'latest']
+          })
+        });
 
-        const collateralUsd = (totalDeposited * btcPrice) / btcDecimals;
-        const debtUsd = totalBorrowed / usdcDecimals;
+        const healthData = await healthRes.json();
+        let collateralUsdVal = BigInt(0);
+        let debtUsdVal = BigInt(0);
+        let hfVal = 0;
 
-        let healthFactor = 0;
-        if (debtUsd > BigInt(0)) {
-          healthFactor = Number((collateralUsd * BigInt(100)) / debtUsd) / 100;
-        } else if (totalDeposited > BigInt(0)) {
-          healthFactor = Infinity;
-        }
-
-        let count = 0;
-        let root = '';
-
-        if (countData) {
-          try {
-            if (typeof countData === 'bigint') {
-              count = Number(countData);
-            } else if (Array.isArray(countData)) {
-              count = Number(countData[0] || 0);
-            }
-          } catch (e) {
-            console.error("Error parsing count:", e);
-          }
-        }
-
-        if (rootData) {
-          try {
-            root = String(rootData);
-          } catch (e) {
-            console.error("Error parsing root:", e);
-          }
+        if (healthData.result && healthData.result.length >= 6) {
+          // get_aggregate_health_factor returns (u256 collateral, u256 debt, u256 health)
+          // each u256 is 2 felts
+          collateralUsdVal = BigInt(healthData.result[0]) + (BigInt(healthData.result[1]) << BigInt(128));
+          debtUsdVal = BigInt(healthData.result[2]) + (BigInt(healthData.result[3]) << BigInt(128));
+          const hfBig = BigInt(healthData.result[4]) + (BigInt(healthData.result[5]) << BigInt(128));
+          hfVal = Number(hfBig) / 1000000;
         }
 
         setStats({
-          totalCollateralUsd: collateralUsd.toString(),
-          totalDebtUsd: debtUsd.toString(),
-          healthFactor,
-          positionCount: count,
-          merkleRoot: root,
+          totalCollateralUsd: (Number(collateralUsdVal) / 1e8).toString(),
+          totalDebtUsd: (Number(debtUsdVal) / 1e8).toString(),
+          healthFactor: hfVal === 0 && collateralUsdVal > 0 ? Infinity : hfVal,
+          positionCount: countData ? Number(countData) : 0,
+          merkleRoot: rootData ? String(rootData) : '',
           totalDepositedRaw: totalDeposited.toString(),
           totalBorrowedRaw: totalBorrowed.toString(),
         });
@@ -254,27 +245,27 @@ export default function DashboardPage() {
 
           <div className="bg-gray-800 p-8 rounded-xl border border-gray-700">
             <h2 className="text-xl font-semibold mb-4">Privacy Guarantees</h2>
-            <div className="space-y-4">
-              <div className="flex items-start space-x-3">
-                <span className="text-green-400">✓</span>
-                <div>
-                  <p className="text-white font-medium">Individual positions are hidden</p>
-                  <p className="text-gray-400 text-sm">No one can see how much collateral or debt you have</p>
+            <div className="grid md:grid-cols-3 gap-6">
+              <div className="space-y-2">
+                <div className="flex items-center space-x-2 text-green-400">
+                  <span>✓</span>
+                  <p className="font-medium text-white">Hidden Positions</p>
                 </div>
+                <p className="text-gray-400 text-sm">No one can see how much BTC you deposited or USDC you borrowed.</p>
               </div>
-              <div className="flex items-start space-x-3">
-                <span className="text-green-400">✓</span>
-                <div>
-                  <p className="text-white font-medium">Liquidation prices are private</p>
-                  <p className="text-gray-400 text-sm">MEV bots cannot calculate your liquidation price</p>
+              <div className="space-y-2">
+                <div className="flex items-center space-x-2 text-green-400">
+                  <span>✓</span>
+                  <p className="font-medium text-white">Private Liquidation</p>
                 </div>
+                <p className="text-gray-400 text-sm">Target prices are concealed. MEV bots cannot front-run your liquidation.</p>
               </div>
-              <div className="flex items-start space-x-3">
-                <span className="text-green-400">✓</span>
-                <div>
-                  <p className="text-white font-medium">Aggregate health is public</p>
-                  <p className="text-gray-400 text-sm">Anyone can verify the vault is healthy without compromising privacy</p>
+              <div className="space-y-2">
+                <div className="flex items-center space-x-2 text-green-400">
+                  <span>✓</span>
+                  <p className="font-medium text-white">Public Solvency</p>
                 </div>
+                <p className="text-gray-400 text-sm">Aggregate health allows the pool to verify solvency without revealing users.</p>
               </div>
             </div>
           </div>

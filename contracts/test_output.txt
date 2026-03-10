@@ -1,0 +1,53 @@
+   Compiling snforge_scarb_plugin v0.56.0 (git+https://github.com/foundry-rs/starknet-foundry?tag=v0.56.0#f530c15269018e08a458d807ba2da2ea2a2b60e6)
+    Blocking waiting for file lock on package cache
+    Finished `release` profile [optimized] target(s) in 0.07s
+   Compiling test(vesu_vault_unittest) vesu_vault v0.1.0 (/Users/anubhavsingh/Desktop/hackathon/VestaZK/starknet-privacy-toolkit/contracts/Scarb.toml)
+error[E0005]: Module file not found. Expected path: /Users/anubhavsingh/Desktop/hackathon/VestaZK/starknet-privacy-toolkit/contracts/src/tests.cairo
+ --> /Users/anubhavsingh/Desktop/hackathon/VestaZK/starknet-privacy-toolkit/contracts/src/lib.cairo:8:1-9:10
+  #[cfg(test)]
+ _^
+| mod tests;
+|__________^
+
+warn: Unused import: `vesu_vault::mock_vesu::Map`
+ --> /Users/anubhavsingh/Desktop/hackathon/VestaZK/starknet-privacy-toolkit/contracts/src/mock_vesu.cairo:3:5
+    Map, StorageMapReadAccess, StorageMapWriteAccess, StoragePointerReadAccess, StoragePointerWriteAccess,
+    ^^^
+
+warn: Unused import: `vesu_vault::mock_vesu::StorageMapReadAccess`
+ --> /Users/anubhavsingh/Desktop/hackathon/VestaZK/starknet-privacy-toolkit/contracts/src/mock_vesu.cairo:3:10
+    Map, StorageMapReadAccess, StorageMapWriteAccess, StoragePointerReadAccess, StoragePointerWriteAccess,
+         ^^^^^^^^^^^^^^^^^^^^
+
+warn: Unused import: `vesu_vault::mock_vesu::StorageMapWriteAccess`
+ --> /Users/anubhavsingh/Desktop/hackathon/VestaZK/starknet-privacy-toolkit/contracts/src/mock_vesu.cairo:3:32
+    Map, StorageMapReadAccess, StorageMapWriteAccess, StoragePointerReadAccess, StoragePointerWriteAccess,
+                               ^^^^^^^^^^^^^^^^^^^^^
+
+warn: Unused import: `vesu_vault::mock_vesu::StoragePointerReadAccess`
+ --> /Users/anubhavsingh/Desktop/hackathon/VestaZK/starknet-privacy-toolkit/contracts/src/mock_vesu.cairo:3:55
+    Map, StorageMapReadAccess, StorageMapWriteAccess, StoragePointerReadAccess, StoragePointerWriteAccess,
+                                                      ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warn: Unused import: `vesu_vault::mock_vesu::StoragePointerWriteAccess`
+ --> /Users/anubhavsingh/Desktop/hackathon/VestaZK/starknet-privacy-toolkit/contracts/src/mock_vesu.cairo:3:81
+    Map, StorageMapReadAccess, StorageMapWriteAccess, StoragePointerReadAccess, StoragePointerWriteAccess,
+                                                                                ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warn: Unused import: `vesu_vault::mock_vesu::MockVesuPool::get_contract_address`
+ --> /Users/anubhavsingh/Desktop/hackathon/VestaZK/starknet-privacy-toolkit/contracts/src/mock_vesu.cairo:22:19
+    use starknet::get_contract_address;
+                  ^^^^^^^^^^^^^^^^^^^^
+
+warn: Unused import: `vesu_vault::mock_vesu::MockVesuPool::StoragePointerReadAccess`
+ --> /Users/anubhavsingh/Desktop/hackathon/VestaZK/starknet-privacy-toolkit/contracts/src/mock_vesu.cairo:24:59
+        Map, StorageMapReadAccess, StorageMapWriteAccess, StoragePointerReadAccess, StoragePointerWriteAccess,
+                                                          ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warn: Unused import: `vesu_vault::mock_vesu::MockVesuPool::StoragePointerWriteAccess`
+ --> /Users/anubhavsingh/Desktop/hackathon/VestaZK/starknet-privacy-toolkit/contracts/src/mock_vesu.cairo:24:85
+        Map, StorageMapReadAccess, StorageMapWriteAccess, StoragePointerReadAccess, StoragePointerWriteAccess,
+                                                                                    ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: could not compile `vesu_vault` due to 1 previous error and 8 warnings
+[ERROR] Failed to build test artifacts with Scarb: `scarb` exited with error

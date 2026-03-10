@@ -9,11 +9,11 @@
 
 #[cfg(test)]
 mod tests {
-    use snforge_std::{declare, ContractClassTrait, start_prank, stop_prank, CheatTarget};
+    use snforge_std::{declare, ContractClassTrait, DeclareResultTrait, start_cheat_caller_address, stop_cheat_caller_address};
     use starknet::ContractAddress;
     use core::traits::Into;
     use vesu_vault::vesu_vault::{IVesuVaultDispatcher, IVesuVaultDispatcherTrait, BorrowPublicInputs};
-    use vesu_vault::erc20::{IERC20Dispatcher, IERC20DispatcherTrait};
+    use vesu_vault::erc20::{IERC20Dispatcher};
 
     // ── helpers ────────────────────────────────────────────────────────
 
@@ -25,9 +25,13 @@ mod tests {
         starknet::contract_address_const::<0x999>()
     }
 
-    fn setup() -> (IVesuVaultDispatcher, ContractAddress, ContractAddress, ContractAddress) {
+    fn deploy_vault(calldata: Array<felt252>) -> ContractAddress {
         let vault_class = declare("VesuVault").unwrap();
+        let (addr, _) = vault_class.contract_class().deploy(@calldata).unwrap();
+        addr
+    }
 
+    fn setup() -> (IVesuVaultDispatcher, ContractAddress, ContractAddress, ContractAddress) {
         let wbtc = starknet::contract_address_const::<0x111>();
         let usdc = starknet::contract_address_const::<0x222>();
         let vesu_pool = starknet::contract_address_const::<0x333>();
@@ -49,7 +53,7 @@ mod tests {
         calldata.append(buffer_percentage.high.into());
         calldata.append(owner.into());
 
-        let (vault_address, _) = vault_class.deploy(@calldata).unwrap();
+        let vault_address = deploy_vault(calldata);
         
         (IVesuVaultDispatcher { contract_address: vault_address }, wbtc, usdc, owner)
     }
@@ -95,9 +99,9 @@ mod tests {
     #[test]
     fn test_owner_can_pause() {
         let (vault, _, _, owner) = setup();
-        start_prank(CheatTarget::One(vault.contract_address), owner);
+        start_cheat_caller_address(vault.contract_address, owner);
         vault.pause();
-        stop_prank(CheatTarget::One(vault.contract_address));
+        stop_cheat_caller_address(vault.contract_address);
 
         assert(vault.get_paused(), 'Should be paused');
     }
@@ -106,10 +110,10 @@ mod tests {
     fn test_owner_can_unpause() {
         let (vault, _, _, owner) = setup();
 
-        start_prank(CheatTarget::One(vault.contract_address), owner);
+        start_cheat_caller_address(vault.contract_address, owner);
         vault.pause();
         vault.unpause();
-        stop_prank(CheatTarget::One(vault.contract_address));
+        stop_cheat_caller_address(vault.contract_address);
 
         assert(!vault.get_paused(), 'Should be unpaused');
     }
@@ -118,9 +122,9 @@ mod tests {
     #[should_panic(expected: ('Only owner can pause',))]
     fn test_non_owner_cannot_pause() {
         let (vault, _, _, _) = setup();
-        start_prank(CheatTarget::One(vault.contract_address), NON_OWNER());
+        start_cheat_caller_address(vault.contract_address, NON_OWNER());
         vault.pause();
-        stop_prank(CheatTarget::One(vault.contract_address));
+        stop_cheat_caller_address(vault.contract_address);
     }
 
     #[test]
@@ -128,14 +132,14 @@ mod tests {
     fn test_non_owner_cannot_unpause() {
         let (vault, _, _, owner) = setup();
         // Pause as owner first
-        start_prank(CheatTarget::One(vault.contract_address), owner);
+        start_cheat_caller_address(vault.contract_address, owner);
         vault.pause();
-        stop_prank(CheatTarget::One(vault.contract_address));
+        stop_cheat_caller_address(vault.contract_address);
 
         // Try to unpause as non-owner
-        start_prank(CheatTarget::One(vault.contract_address), NON_OWNER());
+        start_cheat_caller_address(vault.contract_address, NON_OWNER());
         vault.unpause();
-        stop_prank(CheatTarget::One(vault.contract_address));
+        stop_cheat_caller_address(vault.contract_address);
     }
 
     // ── access control: set_verifier ──────────────────────────────────
@@ -145,9 +149,9 @@ mod tests {
         let (vault, _, _, owner) = setup();
         let new_verifier = starknet::contract_address_const::<0xABC>();
 
-        start_prank(CheatTarget::One(vault.contract_address), owner);
+        start_cheat_caller_address(vault.contract_address, owner);
         vault.set_verifier(new_verifier);
-        stop_prank(CheatTarget::One(vault.contract_address));
+        stop_cheat_caller_address(vault.contract_address);
         // No assertion needed — test passes if no panic
     }
 
@@ -157,9 +161,9 @@ mod tests {
         let (vault, _, _, _) = setup();
         let new_verifier = starknet::contract_address_const::<0xABC>();
 
-        start_prank(CheatTarget::One(vault.contract_address), NON_OWNER());
+        start_cheat_caller_address(vault.contract_address, NON_OWNER());
         vault.set_verifier(new_verifier);
-        stop_prank(CheatTarget::One(vault.contract_address));
+        stop_cheat_caller_address(vault.contract_address);
     }
 
     // ── access control: set_oracle ────────────────────────────────────
@@ -169,9 +173,9 @@ mod tests {
         let (vault, _, _, owner) = setup();
         let new_oracle = starknet::contract_address_const::<0xDEF>();
 
-        start_prank(CheatTarget::One(vault.contract_address), owner);
+        start_cheat_caller_address(vault.contract_address, owner);
         vault.set_oracle(new_oracle);
-        stop_prank(CheatTarget::One(vault.contract_address));
+        stop_cheat_caller_address(vault.contract_address);
     }
 
     #[test]
@@ -180,9 +184,9 @@ mod tests {
         let (vault, _, _, _) = setup();
         let new_oracle = starknet::contract_address_const::<0xDEF>();
 
-        start_prank(CheatTarget::One(vault.contract_address), NON_OWNER());
+        start_cheat_caller_address(vault.contract_address, NON_OWNER());
         vault.set_oracle(new_oracle);
-        stop_prank(CheatTarget::One(vault.contract_address));
+        stop_cheat_caller_address(vault.contract_address);
     }
 
     // ── nullifier tracking ────────────────────────────────────────────

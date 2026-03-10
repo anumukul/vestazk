@@ -167,9 +167,11 @@ export default function BorrowPage() {
 
         console.log("Proof generated successfully:", proofBytes);
       } catch (proofError) {
-        console.warn("Proof generation not available, using mock proof:", proofError);
-        // Use mock proof for demo purposes
-        proofBytes = new Uint8Array([1, 2, 3, 4, 5]);
+        console.error("Proof generation error:", proofError);
+        // Fallback for hackathon demo (user is informed via console)
+        proofBytes = new Uint8Array([1]);
+        setStatus('error'); // Show error state in UI
+        alert("ZK Proof generation failed in browser. Falling back to mock proof for demo.");
       }
 
       // Store proof data for submission
