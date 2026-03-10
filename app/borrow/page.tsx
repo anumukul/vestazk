@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useAccount, useContractWrite } from '@starknet-react/core';
+import { useContractWrite, useAccount } from '@starknet-react/core';
 import { CallData, hash } from 'starknet';
 import { CommitmentStorage } from '../lib/CommitmentStorage';
 import { CONTRACTS, MIN_HEALTH_FACTOR } from '../lib/contracts';
@@ -41,7 +41,7 @@ export default function BorrowPage() {
             method: 'starknet_call',
             params: [{
               contract_address: VAULT_ADDRESS,
-              entry_point_selector: "0x" + BigInt("0x" + Buffer.from("get_merkle_root").toString("hex")).toString(16),
+              entry_point_selector: hash.getSelectorFromName("get_merkle_root"),
               calldata: []
             }, 'latest']
           })
@@ -199,20 +199,18 @@ export default function BorrowPage() {
       const calls = [{
         contractAddress: VAULT_ADDRESS,
         entrypoint: "borrow",
-        calldata: CallData.compile([
-          [1, 2, 3, 4, 5], // mock proof as span
-          generatedProof.merkle_root,
-          generatedProof.borrow_amount,
-          "0",
-          generatedProof.btc_price,
-          "0",
-          generatedProof.usdc_price,
-          "0",
-          generatedProof.min_health_factor,
-          "0",
-          generatedProof.nullifier,
-          address
-        ])
+        calldata: CallData.compile({
+          proof: Array.from(generatedProof.proof as Uint8Array).map((b: number) => b.toString()),
+          public_inputs: {
+            merkle_root: generatedProof.merkle_root,
+            borrow_amount: { low: generatedProof.borrow_amount, high: "0" },
+            btc_price: { low: generatedProof.btc_price, high: "0" },
+            usdc_price: { low: generatedProof.usdc_price, high: "0" },
+            min_health_factor: { low: generatedProof.min_health_factor, high: "0" },
+            nullifier: generatedProof.nullifier,
+          },
+          recipient: address
+        })
       }];
 
       await writeAsync({ calls });

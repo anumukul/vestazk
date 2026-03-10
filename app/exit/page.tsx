@@ -59,7 +59,7 @@ export default function EmergencyExitPage() {
 
     try {
       const currentMerkleRoot = merkleRootData ? merkleRootData.toString() : commitmentData.merkleRoot;
-      
+
       // Generate nullifier for exit
       const nullifier = generateNullifier(commitmentData.commitment);
 
@@ -67,7 +67,7 @@ export default function EmergencyExitPage() {
       let proofBytes = null;
       try {
         const { ProofGenerator } = await import('../lib/ProofGenerator');
-        
+
         // For exit, we need health factor >= 150
         const exitProofInputs = {
           merkle_root: currentMerkleRoot,
@@ -82,7 +82,7 @@ export default function EmergencyExitPage() {
           salt: commitmentData.salt,
           nullifier: nullifier
         };
-        
+
         proofBytes = await ProofGenerator.generateProof(exitProofInputs);
         console.log("Exit proof generated successfully:", proofBytes);
       } catch (proofError) {
@@ -119,16 +119,16 @@ export default function EmergencyExitPage() {
       const calls = [{
         contractAddress: VAULT_ADDRESS,
         entrypoint: "emergency_exit",
-        calldata: CallData.compile([
-          [1, 2, 3, 4, 5], // mock proof as span
-          generatedProof.commitment,
-          generatedProof.btc_amount,
-          "0", // btc_amount high
-          generatedProof.merkle_root,
-          generatedProof.health_factor,
-          "0", // health_factor high
-          generatedProof.nullifier
-        ])
+        calldata: CallData.compile({
+          proof: Array.from(generatedProof.proof as Uint8Array).map((b: number) => b.toString()),
+          public_inputs: {
+            commitment: generatedProof.commitment,
+            btc_amount: { low: generatedProof.btc_amount, high: "0" },
+            merkle_root: generatedProof.merkle_root,
+            health_factor: { low: generatedProof.health_factor, high: "0" },
+            nullifier: generatedProof.nullifier
+          }
+        })
       }];
 
       await writeAsync({ calls });
@@ -175,7 +175,7 @@ export default function EmergencyExitPage() {
         ) : status === 'idle' && (
           <div className="mb-6 p-4 bg-blue-900/30 border border-blue-700 rounded-lg">
             <p className="text-blue-400 text-sm">
-              To exit, your health factor must be above 1.5x (150%). 
+              To exit, your health factor must be above 1.5x (150%).
               A 2% exit fee will be deducted from your collateral.
             </p>
           </div>
