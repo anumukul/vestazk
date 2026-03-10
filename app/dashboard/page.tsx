@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useAccount, useContractRead } from '@starknet-react/core';
+import { hash } from 'starknet';
 import { CONTRACTS, RPC_URL, MIN_HEALTH_FACTOR, BUFFER_PERCENTAGE } from '../lib/contracts';
 import { HealthFactorBar } from '../components/HealthFactorDisplay';
 
@@ -49,7 +50,7 @@ export default function DashboardPage() {
             method: 'starknet_call',
             params: [{
               contract_address: VAULT_ADDRESS,
-              entry_point_selector: '0x' + BigInt('0x' + Buffer.from('get_total_deposited').toString('hex')).toString(16),
+              entry_point_selector: hash.getSelectorFromName('get_total_deposited'),
               calldata: []
             }, 'latest']
           })
@@ -64,7 +65,7 @@ export default function DashboardPage() {
             method: 'starknet_call',
             params: [{
               contract_address: VAULT_ADDRESS,
-              entry_point_selector: '0x' + BigInt('0x' + Buffer.from('get_total_borrowed').toString('hex')).toString(16),
+              entry_point_selector: hash.getSelectorFromName('get_total_borrowed'),
               calldata: []
             }, 'latest']
           })
@@ -205,12 +206,12 @@ export default function DashboardPage() {
             <div className="bg-gray-800 p-6 rounded-xl border border-gray-700">
               <p className="text-gray-400 text-sm">Aggregate Health</p>
               <p className={`text-2xl font-bold mt-1 ${stats.healthFactor === Infinity || stats.healthFactor >= 1.5
-                  ? 'text-green-400'
-                  : stats.healthFactor >= 1.2
-                    ? 'text-yellow-400'
-                    : stats.healthFactor > 0
-                      ? 'text-red-400'
-                      : 'text-gray-400'
+                ? 'text-green-400'
+                : stats.healthFactor >= 1.2
+                  ? 'text-yellow-400'
+                  : stats.healthFactor > 0
+                    ? 'text-red-400'
+                    : 'text-gray-400'
                 }`}>
                 {stats.healthFactor === Infinity
                   ? '∞ (No Debt)'
