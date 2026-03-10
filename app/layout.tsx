@@ -3,6 +3,7 @@
 import "./globals.css";
 import { StarknetProvider } from "./components/StarknetProvider";
 import { ConnectButton } from "./components/ConnectButton";
+import Link from 'next/link';
 
 function ClientLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -13,11 +14,11 @@ function ClientLayout({ children }: { children: React.ReactNode }) {
             <span className="text-2xl font-bold text-primary">VestaZK</span>
           </div>
           <div className="flex items-center space-x-6">
-            <a href="/" className="hover:text-primary transition">Home</a>
-            <a href="/deposit" className="hover:text-primary transition">Deposit</a>
-            <a href="/borrow" className="hover:text-primary transition">Borrow</a>
-            <a href="/dashboard" className="hover:text-primary transition">Dashboard</a>
-            <a href="/exit" className="text-red-400 hover:text-red-300 transition">Emergency Exit</a>
+            <Link href="/" className="hover:text-primary transition">Home</Link>
+            <Link href="/deposit" className="hover:text-primary transition">Deposit</Link>
+            <Link href="/borrow" className="hover:text-primary transition">Borrow</Link>
+            <Link href="/dashboard" className="hover:text-primary transition">Dashboard</Link>
+            <Link href="/exit" className="text-red-400 hover:text-red-300 transition">Emergency Exit</Link>
             <ConnectButton />
           </div>
         </nav>

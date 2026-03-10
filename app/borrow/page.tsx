@@ -41,7 +41,7 @@ export default function BorrowPage() {
             method: 'starknet_call',
             params: [{
               contract_address: VAULT_ADDRESS,
-              entry_point_selector: "get_merkle_root",
+              entry_point_selector: "0x" + BigInt("0x" + Buffer.from("get_merkle_root").toString("hex")).toString(16),
               calldata: []
             }, 'latest']
           })

@@ -26,7 +26,7 @@ export function ConnectButton() {
       >
         Connect Wallet
       </button>
-      
+
       {isOpen && (
         <div className="absolute right-0 mt-2 w-48 bg-gray-800 border border-gray-700 rounded-lg shadow-xl z-50">
           {connectors.map((connector, index) => (
@@ -36,10 +36,13 @@ export function ConnectButton() {
                 connect({ connector });
                 setIsOpen(false);
               }}
-              className="w-full px-4 py-3 text-left hover:bg-gray-700 transition flex items-center space-x-2"
+              className="w-full px-4 py-3 text-left hover:bg-gray-700 transition flex items-center space-x-3"
             >
-              <span className="text-lg">🦊</span>
-              <span>Wallet {index + 1}</span>
+              {connector.icon && (
+                <img src={typeof connector.icon === 'string' ? connector.icon : connector.icon.light} alt={connector.id} className="w-6 h-6" />
+              )}
+              {!connector.icon && <span className="text-lg">🦊</span>}
+              <span className="font-medium">{connector.name || `Wallet ${index + 1}`}</span>
             </button>
           ))}
         </div>
