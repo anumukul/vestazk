@@ -68,7 +68,7 @@ pub mod VesuVault {
     };
     use crate::ipragma::{IPragmaOracleDispatcher, IPragmaOracleDispatcherTrait};
     use crate::ivesu::{IVesuPoolDispatcher, IVesuPoolDispatcherTrait};
-    use crate::verifier::{IUltraStarknetZKHonkVerifierDispatcher, IUltraStarknetZKHonkVerifierDispatcherTrait};
+    use crate::verifier::{IVerifierDispatcher, IVerifierDispatcherTrait};
     use core::poseidon::poseidon_hash_span;
     use starknet::get_caller_address;
     use starknet::get_contract_address;
@@ -278,25 +278,19 @@ pub mod VesuVault {
                 'Nullifier already used'
             );
 
-            // Verify ZK proof using the real Garaga UltraHonk verifier
-            let verifier = IUltraStarknetZKHonkVerifierDispatcher {
-                contract_address: self.verifier.read()
-            };
-            let verified_inputs = verifier.verify_ultra_starknet_zk_honk_proof(proof);
-
-            // Garaga returns Option::Some(public_inputs) on success, None on failure
-            match verified_inputs {
-                Option::Some(verified_pub_inputs) => {
-                    // Verify that the proof's public inputs match what the user claimed
-                    // Public inputs order from the Noir circuit:
-                    //   [0] merkle_root, [1] borrow_amount, [2] btc_price,
-                    //   [3] usdc_price, [4] min_health_factor, [5] nullifier
-                    assert(verified_pub_inputs.len() >= 6, 'Invalid public inputs count');
-                },
-                Option::None => {
-                    assert(false, 'Invalid ZK proof');
-                },
-            };
+            // Verify ZK proof
+            let verifier = IVerifierDispatcher { contract_address: self.verifier.read() };
+            let is_valid = verifier.verify_proof(
+                proof,
+                public_inputs.merkle_root,
+                public_inputs.borrow_amount.low,
+                public_inputs.borrow_amount.high,
+                public_inputs.btc_price.low,
+                public_inputs.usdc_price.low,
+                public_inputs.min_health_factor.low,
+                public_inputs.nullifier
+            );
+            assert(is_valid, 'Invalid ZK proof');
 
             let (collateral_usd, debt_usd, _) = self.get_aggregate_health_factor();
             
@@ -341,20 +335,19 @@ pub mod VesuVault {
                 'Nullifier already used'
             );
 
-            // Verify ZK proof using the real Garaga UltraHonk verifier
-            let verifier = IUltraStarknetZKHonkVerifierDispatcher {
-                contract_address: self.verifier.read()
-            };
-            let verified_inputs = verifier.verify_ultra_starknet_zk_honk_proof(proof);
-
-            match verified_inputs {
-                Option::Some(_verified_pub_inputs) => {
-                    // Proof is valid — public inputs verified by the circuit
-                },
-                Option::None => {
-                    assert(false, 'Invalid exit ZK proof');
-                },
-            };
+            // Verify ZK proof for emergency exit
+            let verifier = IVerifierDispatcher { contract_address: self.verifier.read() };
+            let is_valid = verifier.verify_exit_proof(
+                proof,
+                public_inputs.commitment,
+                public_inputs.btc_amount.low,
+                public_inputs.btc_amount.high,
+                public_inputs.merkle_root,
+                public_inputs.health_factor.low,
+                public_inputs.health_factor.high,
+                public_inputs.nullifier
+            );
+            assert(is_valid, 'Invalid exit ZK proof');
 
             let user_collateral = public_inputs.btc_amount;
             let exit_fee = (user_collateral * u256 { low: 2, high: 0 }) / u256 { low: 100, high: 0 };
@@ -362,7 +355,7 @@ pub mod VesuVault {
 
             // Withdraw from Vesu
             let vesu = IVesuPoolDispatcher { contract_address: self.vesu_pool.read() };
-            vesu.withdraw(self.wbtc_token.read(), user_collateral);
+            vesu.withdraw(self.wbtc_token.read(), user_collateral); // Withdraw full collateral amount
 
             let wbtc = IERC20Dispatcher { contract_address: self.wbtc_token.read() };
             let caller = get_caller_address();
