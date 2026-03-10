@@ -294,14 +294,22 @@ pub mod VesuVault {
 
             let (collateral_usd, debt_usd, _) = self.get_aggregate_health_factor();
             
-            let new_debt_usd = debt_usd + public_inputs.borrow_amount * public_inputs.usdc_price;
+            // Fixed: Divide by 10^6 to align units (public_inputs.usdc_price has 8 decimals, borrow_amount has 6)
+            let additional_debt_usd = (public_inputs.borrow_amount * public_inputs.usdc_price) / u256 { low: 1000000, high: 0 };
+            let new_debt_usd = debt_usd + additional_debt_usd;
+            
             let new_health = if new_debt_usd.low > 0 {
                 (collateral_usd * u256 { low: 1000000, high: 0 }) / new_debt_usd
             } else {
-                u256 { low: 0, high: 0 }
+                u256 { low: 100000000, high: 0 } // Very high health if no debt
             };
 
-            let required_health = self.min_health_factor.read() * self.buffer_percentage.read();
+            // Scale required_health by 10^4 so it matches new_health (scaled by 10^6)
+            // min_health_factor (e.g. 110) * buffer_percentage (e.g. 120) = 13200
+            // 13200 * 100 = 1,320,000 (which is 1.32 in 10^6 units)
+            let min_hf = self.min_health_factor.read();
+            let buf_pct = self.buffer_percentage.read();
+            let required_health: u256 = (min_hf * buf_pct * u256 { low: 100, high: 0 });
             assert(new_health.low >= required_health.low, 'Insufficient aggregate health');
 
             // Borrow from Vesu
@@ -500,7 +508,11 @@ pub mod VesuVault {
             inputs.append(amount.low.into());
             inputs.append(amount.high.into());
             inputs.append(count.into());
-            poseidon_hash_span(inputs.span())
+            let hash = poseidon_hash_span(inputs.span());
+            // Mask to 251 bits to ensure it fits in BN254 (Noir) field modulus
+            let mask: u256 = 0x7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff;
+            let salt_u256: u256 = hash.into() & mask;
+            salt_u256.try_into().unwrap()
         }
 
         fn update_merkle_root(

@@ -92,8 +92,9 @@ export default function BorrowPage() {
     }
   }, [address]);
 
-  const generateNullifier = (commitment: string, borrowAmount: string): string => {
-    return computePoseidonHashOnElements([commitment, borrowAmount]).toString();
+  const generateNullifier = (salt: string, borrowAmount: string): string => {
+    // Nullifier should be derived from the secret salt to prevent tracing
+    return computePoseidonHashOnElements([salt, borrowAmount]).toString();
   };
 
   const handleGenerateProof = async () => {
@@ -138,8 +139,8 @@ export default function BorrowPage() {
 
       const borrowAmountParsed = Math.floor(parseFloat(borrowAmount) * 1000000); // USDC 6 decimals
 
-      // Generate nullifier
-      const nullifier = generateNullifier(data.commitment, borrowAmountParsed.toString());
+      // Generate nullifier using the SECRET salt
+      const nullifier = generateNullifier(data.salt, borrowAmountParsed.toString());
 
       const btcPriceStr = "65000000000";
       const usdcPriceStr = "1000000";
