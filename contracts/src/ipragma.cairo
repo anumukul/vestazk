@@ -1,14 +1,20 @@
+#[derive(Drop, Copy, Serde)]
+pub enum DataType {
+    SpotEntry: felt252,
+    FutureEntry: (felt252, u64),
+    GenericEntry: felt252,
+}
+
 #[derive(Drop, Clone, Serde, PartialEq)]
 pub struct PragmaPricesResponse {
     pub price: u128,
     pub decimals: u32,
-    pub timestamp: u64,
-    pub source: felt252,
+    pub last_updated_timestamp: u64,
+    pub num_sources_aggregated: u32,
+    pub expiration_timestamp: Option<u64>,
 }
 
 #[starknet::interface]
 pub trait IPragmaOracle<TContractState> {
-    fn get_spot_price(self: @TContractState, pair_id: felt252) -> PragmaPricesResponse;
-    fn get_data_median(self: @TContractState, pair_id: felt252) -> PragmaPricesResponse;
-    fn get_latest_timestamp(self: @TContractState, pair_id: felt252) -> u64;
+    fn get_data_median(self: @TContractState, data_type: DataType) -> PragmaPricesResponse;
 }

@@ -66,7 +66,7 @@ pub mod VesuVault {
         ArrayTrait, ContractAddress, IERC20Dispatcher, IERC20DispatcherTrait, 
         IVesuVault, u256, BorrowPublicInputs, ExitPublicInputs
     };
-    use crate::ipragma::{IPragmaOracleDispatcher, IPragmaOracleDispatcherTrait};
+    use crate::ipragma::{IPragmaOracleDispatcher, IPragmaOracleDispatcherTrait, DataType};
     use crate::ivesu::{IVesuPoolDispatcher, IVesuPoolDispatcherTrait};
     use crate::verifier::{IVerifierDispatcher, IVerifierDispatcherTrait};
     use core::poseidon::poseidon_hash_span;
@@ -436,13 +436,13 @@ pub mod VesuVault {
         fn get_btc_price(self: @ContractState) -> u256 {
             let oracle = IPragmaOracleDispatcher { contract_address: self.pragma_oracle.read() };
             // BTC/USD pair id is short string 'BTC/USD'
-            let response = oracle.get_data_median('BTC/USD');
+            let response = oracle.get_data_median(DataType::SpotEntry('BTC/USD'));
             u256 { low: response.price.into(), high: 0 }
         }
 
         fn get_usdc_price(self: @ContractState) -> u256 {
             let oracle = IPragmaOracleDispatcher { contract_address: self.pragma_oracle.read() };
-            let response = oracle.get_data_median('USDC/USD');
+            let response = oracle.get_data_median(DataType::SpotEntry('USDC/USD'));
             u256 { low: response.price.into(), high: 0 }
         }
 
