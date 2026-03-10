@@ -1,12 +1,24 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAccount, useConnect } from '@starknet-react/core';
 
 export function ConnectButton() {
   const { address, status } = useAccount();
   const { connect, connectors } = useConnect();
   const [isOpen, setIsOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  // Prevent SSR hydration mismatch and premature disconnect
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) return (
+    <button className="px-4 py-2 bg-gray-800 text-gray-400 rounded-lg font-medium transition cursor-not-allowed">
+      Loading...
+    </button>
+  );
 
   if (status === 'connected' && address) {
     return (
