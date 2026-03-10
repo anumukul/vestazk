@@ -6,6 +6,7 @@ import { CallData, hash } from 'starknet';
 import { CommitmentStorage } from '../lib/CommitmentStorage';
 import { CONTRACTS, MIN_HEALTH_FACTOR } from '../lib/contracts';
 import { HealthFactorDisplay } from '../components/HealthFactorDisplay';
+import vaultAbi from '../lib/vesu_vault_abi.json';
 const { computePoseidonHashOnElements } = hash;
 
 const RPC_URL = "https://starknet-sepolia.g.alchemy.com/starknet/version/rpc/v0_10/cf52O0RwFy1mEB0uoYsel";
@@ -196,24 +197,24 @@ export default function BorrowPage() {
 
     setIsSubmitting(true);
     try {
+      const callData = new CallData(vaultAbi);
+      const calldata = callData.compile("borrow", {
+        proof: Array.from(generatedProof.proof as Uint8Array).map((b: number) => b.toString()),
+        public_inputs: {
+          merkle_root: generatedProof.merkle_root,
+          borrow_amount: generatedProof.borrow_amount,
+          btc_price: generatedProof.btc_price,
+          usdc_price: generatedProof.usdc_price,
+          min_health_factor: generatedProof.min_health_factor,
+          nullifier: generatedProof.nullifier,
+        },
+        recipient: address
+      });
+
       const calls = [{
         contractAddress: VAULT_ADDRESS,
         entrypoint: "borrow",
-        calldata: CallData.compile({
-          proof: Array.from(generatedProof.proof as Uint8Array).map((b: number) => b.toString()),
-          public_inputs: {
-            merkle_root: generatedProof.merkle_root,
-            borrow_amount: { low: generatedProof.borrow_amount, high: "0" },
-            btc_price: { low: generatedProof.btc_price, high: "0" },
-            usdc_price: { low: generatedProof.usdc_price, high: "0" },
-            min_health_factor: { low: generatedProof.min_health_factor, high: "0" },
-            nullifier: generatedProof.nullifier,
-          },
-          recipient: address
-        }).map((v: any) => {
-          const s = v.toString();
-          return s.startsWith("0x") ? s : "0x" + BigInt(s).toString(16);
-        })
+        calldata
       }];
 
       await writeAsync({ calls });

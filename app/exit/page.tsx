@@ -5,6 +5,7 @@ import { useAccount, useContractWrite, useContractRead } from '@starknet-react/c
 import { CallData, hash } from 'starknet';
 import { CommitmentStorage } from '../lib/CommitmentStorage';
 import { CONTRACTS } from '../lib/contracts';
+import vaultAbi from '../lib/vesu_vault_abi.json';
 const { computePoseidonHashOnElements } = hash;
 
 export default function EmergencyExitPage() {
@@ -116,22 +117,22 @@ export default function EmergencyExitPage() {
 
     setIsSubmitting(true);
     try {
+      const callData = new CallData(vaultAbi);
+      const calldata = callData.compile("emergency_exit", {
+        proof: Array.from(generatedProof.proof as Uint8Array).map((b: number) => b.toString()),
+        public_inputs: {
+          commitment: generatedProof.commitment,
+          btc_amount: generatedProof.btc_amount,
+          merkle_root: generatedProof.merkle_root,
+          health_factor: generatedProof.health_factor,
+          nullifier: generatedProof.nullifier
+        }
+      });
+
       const calls = [{
         contractAddress: VAULT_ADDRESS,
         entrypoint: "emergency_exit",
-        calldata: CallData.compile({
-          proof: Array.from(generatedProof.proof as Uint8Array).map((b: number) => b.toString()),
-          public_inputs: {
-            commitment: generatedProof.commitment,
-            btc_amount: { low: generatedProof.btc_amount, high: "0" },
-            merkle_root: generatedProof.merkle_root,
-            health_factor: { low: generatedProof.health_factor, high: "0" },
-            nullifier: generatedProof.nullifier
-          }
-        }).map((v: any) => {
-          const s = v.toString();
-          return s.startsWith("0x") ? s : "0x" + BigInt(s).toString(16);
-        })
+        calldata
       }];
 
       await writeAsync({ calls });
