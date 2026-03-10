@@ -128,6 +128,9 @@ export default function EmergencyExitPage() {
             health_factor: { low: generatedProof.health_factor, high: "0" },
             nullifier: generatedProof.nullifier
           }
+        }).map((v: any) => {
+          const s = v.toString();
+          return s.startsWith("0x") ? s : "0x" + BigInt(s).toString(16);
         })
       }];
 

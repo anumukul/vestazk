@@ -210,6 +210,9 @@ export default function BorrowPage() {
             nullifier: generatedProof.nullifier,
           },
           recipient: address
+        }).map((v: any) => {
+          const s = v.toString();
+          return s.startsWith("0x") ? s : "0x" + BigInt(s).toString(16);
         })
       }];
 
