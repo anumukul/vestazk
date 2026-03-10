@@ -192,34 +192,7 @@ Noir Circuit → Barretenberg → Garaga → Starknet
 - Pragma price oracle is honest
 - ZK proof system is sound (discrete log hardness)
 
-⚠️ **WARNING**: This is a hackathon project. NOT AUDITED. Do not use with real funds until fully audited.
 
-## Roadmap
-
-### Phase 1: Foundation ✅ (COMPLETED)
-- [x] Project setup
-- [x] Documentation
-- [x] Basic vault contract
-
-### Phase 2: Core Features (IN PROGRESS)
-- [x] VesuVault contract with deposit
-- [ ] Borrow with ZK proof verification
-- [ ] Aggregate health tracking
-- [ ] Emergency exit mechanism
-
-### Phase 3: ZK Circuit
-- [x] Lending proof circuit
-- [ ] Generate Garaga verifier
-- [ ] Deploy verifier to Sepolia
-
-### Phase 4: Frontend
-- [ ] Deposit page
-- [ ] Borrow page with proof generation
-- [ ] Dashboard with aggregate stats
-
-### Phase 5: Deployment
-- [ ] Deploy to Sepolia testnet
-- [ ] End-to-end testing
 
 ## Resources
 
