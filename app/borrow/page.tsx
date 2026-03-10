@@ -5,6 +5,7 @@ import { useAccount, useContractWrite } from '@starknet-react/core';
 import { CallData, hash } from 'starknet';
 import { CommitmentStorage } from '../lib/CommitmentStorage';
 import { CONTRACTS, MIN_HEALTH_FACTOR } from '../lib/contracts';
+import { HealthFactorDisplay } from '../components/HealthFactorDisplay';
 const { computePoseidonHashOnElements } = hash;
 
 const RPC_URL = "https://starknet-sepolia.g.alchemy.com/starknet/version/rpc/v0_10/cf52O0RwFy1mEB0uoYsel";
@@ -124,7 +125,7 @@ export default function BorrowPage() {
       if (!data) {
         data = CommitmentStorage.load(address);
       }
-      
+
       if (!data) {
         throw new Error("No commitment data found. Please deposit first.");
       }
@@ -133,9 +134,9 @@ export default function BorrowPage() {
       const currentMerkleRoot = merkleRoot;
       console.log("Current merkle root:", currentMerkleRoot);
       console.log("Stored merkle root:", data.merkleRoot);
-      
+
       const borrowAmountParsed = Math.floor(parseFloat(borrowAmount) * 1000000); // USDC 6 decimals
-      
+
       // Generate nullifier
       const nullifier = generateNullifier(data.commitment, borrowAmountParsed.toString());
 
@@ -147,7 +148,7 @@ export default function BorrowPage() {
       let proofBytes = null;
       try {
         const { ProofGenerator } = await import('../lib/ProofGenerator');
-        
+
         proofBytes = await ProofGenerator.generateProof({
           merkle_root: currentMerkleRoot,
           merkle_path: data.merklePath,
@@ -161,7 +162,7 @@ export default function BorrowPage() {
           salt: data.salt,
           nullifier: nullifier
         });
-        
+
         console.log("Proof generated successfully:", proofBytes);
       } catch (proofError) {
         console.warn("Proof generation not available, using mock proof:", proofError);
@@ -259,18 +260,9 @@ export default function BorrowPage() {
         </div>
 
         {healthFactor !== null && (
-          <div className={`mb-6 p-4 rounded-lg border ${healthFactor >= 1.5 ? 'bg-green-900/30 border-green-700' :
-            healthFactor >= 1.2 ? 'bg-yellow-900/30 border-yellow-700' :
-              'bg-red-900/30 border-red-700'
-            }`}>
-            <p className="text-gray-300">Health Factor:</p>
-            <p className={`text-2xl font-bold ${healthFactor >= 1.5 ? 'text-green-400' :
-              healthFactor >= 1.2 ? 'text-yellow-400' :
-                'text-red-400'
-              }`}>
-              {healthFactor.toFixed(2)}x
-            </p>
-            <p className="text-sm text-gray-400 mt-1">
+          <div className="mb-6">
+            <HealthFactorDisplay health={healthFactor} />
+            <p className="text-sm text-gray-400 mt-2">
               {healthFactor >= minHealthFactor ? '✓ Sufficient collateral' : `✗ Below minimum (${minHealthFactor})`}
             </p>
           </div>
