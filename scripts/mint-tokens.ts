@@ -5,7 +5,7 @@ const RPC_URL = "https://starknet-sepolia.g.alchemy.com/starknet/version/rpc/v0_
 const WBTC_ADDRESS = "0x07d0fc03b7853f9dad8bb8a5bcac9ad8716c464428298f3770c909a11520061c";
 const USDC_ADDRESS = "0x017947ec3c751a4aacca5b86aba3d809902455fcc0008e3b1433e69ea60851a4";
 
-const DEPLOYER_ADDRESS = "0x550a0c6f33884299b8ae150c17c4c9409bce3873d61183e47aa652562ad7c5c";
+const DEPLOYER_ADDRESS = "0x00731f307c7d91b94d88bfea5c43efabafbd71bbedfaabf3ba13aac012745b9f";
 
 // ERC20 ABI (minimal for minting)
 const ERC20_ABI = [

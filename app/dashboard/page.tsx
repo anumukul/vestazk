@@ -15,7 +15,6 @@ export default function DashboardPage() {
     functionName: 'get_commitment_count',
     args: [],
     watch: true,
-    blockIdentifier: 'latest',
   });
 
   const { data: rootData, error: rootError, isLoading: rootLoading, refetch: refetchRoot } = useContractRead({
@@ -23,7 +22,6 @@ export default function DashboardPage() {
     functionName: 'get_merkle_root',
     args: [],
     watch: true,
-    blockIdentifier: 'latest',
   });
 
   const [stats, setStats] = useState({
