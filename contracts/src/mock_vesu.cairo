@@ -1,7 +1,4 @@
 use starknet::ContractAddress;
-use starknet::storage::{
-    Map, StorageMapReadAccess, StorageMapWriteAccess, StoragePointerReadAccess, StoragePointerWriteAccess,
-};
 
 #[starknet::interface]
 pub trait IVesuPool<TContractState> {
@@ -18,10 +15,11 @@ pub trait IVesuPool<TContractState> {
 #[starknet::contract]
 pub mod MockVesuPool {
     use super::{IVesuPool, ContractAddress};
+    use crate::erc20::{IERC20Dispatcher, IERC20DispatcherTrait};
     use starknet::get_caller_address;
     use starknet::get_contract_address;
     use starknet::storage::{
-        Map, StorageMapReadAccess, StorageMapWriteAccess, StoragePointerReadAccess, StoragePointerWriteAccess,
+        Map, StorageMapReadAccess, StorageMapWriteAccess,
     };
 
     #[storage]
@@ -40,6 +38,11 @@ pub mod MockVesuPool {
         fn supply(ref self: ContractState, asset: ContractAddress, amount: u256) -> u256 {
             let caller = get_caller_address();
             let current = self.collateral.read((caller, asset));
+            let asset_token = IERC20Dispatcher { contract_address: asset };
+            let pool_address = get_contract_address();
+            let transferred = asset_token.transfer_from(caller, pool_address, amount);
+            assert(transferred, 'Supply transfer failed');
+
             self.collateral.write((caller, asset), current + amount);
             
             let total = self.total_supply.read(asset);
@@ -57,6 +60,10 @@ pub mod MockVesuPool {
             
             let total = self.total_supply.read(asset);
             self.total_supply.write(asset, total - amount);
+
+            let asset_token = IERC20Dispatcher { contract_address: asset };
+            let transferred = asset_token.transfer(caller, amount);
+            assert(transferred, 'Withdraw transfer failed');
             
             amount
         }
@@ -68,6 +75,10 @@ pub mod MockVesuPool {
             
             let total = self.total_borrowed.read(asset);
             self.total_borrowed.write(asset, total + amount);
+
+            // Mint mock liquidity directly to the borrower so the vault can forward it.
+            let asset_token = IERC20Dispatcher { contract_address: asset };
+            asset_token.mint(caller, amount);
             
             amount
         }
@@ -76,6 +87,11 @@ pub mod MockVesuPool {
             let caller = get_caller_address();
             let current_debt = self.debt.read((caller, asset));
             let repay_amount = if current_debt >= amount { amount } else { current_debt };
+
+            let asset_token = IERC20Dispatcher { contract_address: asset };
+            let pool_address = get_contract_address();
+            let transferred = asset_token.transfer_from(caller, pool_address, repay_amount);
+            assert(transferred, 'Repay transfer failed');
             
             self.debt.write((caller, asset), current_debt - repay_amount);
             

@@ -28,6 +28,7 @@ export default function BorrowPage() {
   const minHealthFactor = MIN_HEALTH_FACTOR / 100;
 
   const VAULT_ADDRESS = CONTRACTS.sepolia.vault;
+  const USDC_ADDRESS = CONTRACTS.sepolia.usdc;
 
   // Fetch merkle root using direct RPC call
   useEffect(() => {
@@ -95,6 +96,35 @@ export default function BorrowPage() {
   const generateNullifier = (salt: string, borrowAmount: string): string => {
     // Nullifier should be derived from the secret salt to prevent tracing
     return computePoseidonHashOnElements([salt, borrowAmount]).toString();
+  };
+
+  const toUint256Calldata = (value: bigint): [string, string] => {
+    const mask = (BigInt(1) << BigInt(128)) - BigInt(1);
+    return [(value & mask).toString(), (value >> BigInt(128)).toString()];
+  };
+
+  const readUint256 = async (contractAddress: string, entrypoint: string, calldata: string[]) => {
+    const response = await fetch(RPC_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        jsonrpc: '2.0',
+        id: 1,
+        method: 'starknet_call',
+        params: [{
+          contract_address: contractAddress,
+          entry_point_selector: hash.getSelectorFromName(entrypoint),
+          calldata
+        }, 'latest']
+      })
+    });
+
+    const data = await response.json();
+    if (!data.result || data.result.length < 2) {
+      throw new Error(`Failed to read ${entrypoint}`);
+    }
+
+    return BigInt(data.result[0]) + (BigInt(data.result[1]) << BigInt(128));
   };
 
   const handleGenerateProof = async () => {
@@ -200,6 +230,12 @@ export default function BorrowPage() {
 
     setIsSubmitting(true);
     try {
+      const borrowAmountValue = BigInt(generatedProof.borrow_amount);
+      const vaultUsdcBalance = await readUint256(USDC_ADDRESS, 'balance_of', [VAULT_ADDRESS]);
+      const liquidityDeficit = borrowAmountValue > vaultUsdcBalance
+        ? borrowAmountValue - vaultUsdcBalance
+        : BigInt(0);
+
       const callData = new CallData(vaultAbi);
       const calldata = callData.compile("borrow", {
         proof: Array.from(generatedProof.proof as Uint8Array).map((b: number) => b.toString()),
@@ -214,11 +250,25 @@ export default function BorrowPage() {
         recipient: address
       });
 
-      const calls = [{
+      const calls = [];
+
+      if (liquidityDeficit > 0) {
+        const [deficitLow, deficitHigh] = toUint256Calldata(liquidityDeficit);
+
+        // Sepolia uses mock ERC20 + mock pool contracts, so the vault must be topped up
+        // with mock USDC before it can forward the borrowed amount to the recipient.
+        calls.push({
+          contractAddress: USDC_ADDRESS,
+          entrypoint: "mint",
+          calldata: CallData.compile([VAULT_ADDRESS, deficitLow, deficitHigh])
+        });
+      }
+
+      calls.push({
         contractAddress: VAULT_ADDRESS,
         entrypoint: "borrow",
         calldata
-      }];
+      });
 
       await writeAsync({ calls });
       setStatus('success');
